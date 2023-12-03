@@ -11,9 +11,12 @@ public class PurchaseRequestDto {
 
     private List<PurchaseDetail> purchaseList;
 
-    private static class PurchaseDetail {
+    @Getter
+    public static class PurchaseDetail {
+
         private Long productId;
         private int amount;
     }
+
 }
 
