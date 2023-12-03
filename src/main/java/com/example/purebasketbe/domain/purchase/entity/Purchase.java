@@ -1,8 +1,7 @@
 package com.example.purebasketbe.domain.purchase.entity;
 
 import com.example.purebasketbe.domain.product.entity.Product;
-import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto;
-import com.example.purebasketbe.domain.user.entity.User;
+import com.example.purebasketbe.domain.Member.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
