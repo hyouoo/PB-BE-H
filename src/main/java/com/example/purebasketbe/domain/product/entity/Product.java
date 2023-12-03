@@ -86,5 +86,12 @@ public class Product {
         this.discountRate = requestDto.getDiscountRate() == null ? this.discountRate : requestDto.getDiscountRate();
 
     }
+    public void incrementCount(int amount) {
+        this.salesCount += amount;
+    }
+
+    public void decrementStock(int amount) {
+        this.stock -= amount;
+    }
 
 }
