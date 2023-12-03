@@ -9,10 +9,13 @@ import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto.PurchaseD
 import com.example.purebasketbe.domain.purchase.entity.Purchase;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +27,11 @@ public class PurchaseService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
 
+    private final int PRODUCTS_PER_PAGE = 20;
 
-//    @Transactional
-//    public void purchaseProducts(final List<PurchaseDetail> purchaseRequestDtoList, Member member) {
+
+    @Transactional
+    public void purchaseProducts(final List<PurchaseDetail> purchaseRequestDtoList, Member member) {
 //        // TODO: List size 1인 경우와 아닌 경우 나누기
 //        List<PurchaseDetail> sortedPurchaseDetailList = purchaseRequestDtoList.stream()
 //            .sorted(Comparator.comparing(PurchaseDetail::getProductId)).toList();
@@ -56,18 +61,24 @@ public class PurchaseService {
 //
 //        purchaseRepository.saveAll(purchaseList);
 //        cartRepository.deleteByUserAndProductIn(member, validProductList);
-//    }
+    }
 
 
 
     @Transactional(readOnly = true)
-    public List<PurchaseHistoryDto> getPurchaseHistory(Member member) {
-        List<Purchase> purchaseList = purchaseRepository.findAllByMember(member);
 
-        return purchaseList.stream().map(purchase -> {
+    public Page<PurchaseHistoryDto> getPurchaseHistory(Member member, int page, String sortBy, String order) {
+
+        Sort.Direction direction = Direction.valueOf(order.toUpperCase());
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, PRODUCTS_PER_PAGE, sort);
+
+        Page<Purchase> purchases = purchaseRepository.findAllByMember(member, pageable);
+
+        return purchases.map(purchase -> {
             Product product = getProductById(purchase.getProduct().getId());
             return PurchaseHistoryDto.of(product, purchase);
-        }).toList();
+        });
     }
 
     private static void checkProductStock(Product product, int amount) {
@@ -81,4 +92,6 @@ public class PurchaseService {
             () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
         );
     }
+
+
 }
