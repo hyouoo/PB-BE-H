@@ -1,7 +1,7 @@
 package com.example.purebasketbe.domain.purchase;
 
 import com.example.purebasketbe.domain.member.entity.Member;
-import com.example.purebasketbe.domain.purchase.dto.PurchaseHistoryDto;
+import com.example.purebasketbe.domain.purchase.dto.PurchaseHistoryResponseDto;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto;
 import com.example.purebasketbe.global.tool.LoginAccount;
 import java.net.URI;
@@ -28,14 +28,14 @@ public class PurchaseController {
                                                   @LoginAccount Member member) {
         purchaseService.purchaseProducts(purchaseRequestDto.getPurchaseList(), member);
 
-        return ResponseEntity.status(HttpStatus.CREATED).location(URI.create("")).build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/histories")
-    public ResponseEntity<Page<PurchaseHistoryDto>> getPurchaseHistory(
+    public ResponseEntity<Page<PurchaseHistoryResponseDto>> getPurchaseHistory(
         @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue="purchasedAt") String sortBy,
         @RequestParam(defaultValue = "desc") String order, @LoginAccount Member member) {
-        Page<PurchaseHistoryDto> responseBody = purchaseService.getPurchaseHistory(member, page - 1, sortBy, order);
+        Page<PurchaseHistoryResponseDto> responseBody = purchaseService.getPurchaseHistory(member, page - 1, sortBy, order);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 }
