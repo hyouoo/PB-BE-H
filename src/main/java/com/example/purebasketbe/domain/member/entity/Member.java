@@ -1,12 +1,7 @@
 package com.example.purebasketbe.domain.member.entity;
 
 import com.example.purebasketbe.domain.member.dto.SignupRequestDto;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,10 +30,14 @@ public class Member {
     private String address;
 
     @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private final UserRole role = UserRole.MEMBER;
+
+    @Column(nullable = false)
     private boolean deleted = false;
 
     @Builder
-    private Member(String email, String password, String phone, String address, boolean deleted){
+    private Member(String email, String password, String phone, String address, UserRole role, boolean deleted){
         this.email = email;
         this.password = password;
         this.phone = phone;
@@ -52,6 +51,7 @@ public class Member {
             .password(password)
             .phone(requestDto.phone())
             .address(requestDto.address())
+            .role(UserRole.MEMBER)
             .deleted(requestDto.deleted())
             .build();
     }

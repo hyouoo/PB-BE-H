@@ -49,7 +49,7 @@ public class Cart {
     public static Cart of(CartRequestDto requestDto, Member member, Product product) {
         return Cart.builder()
             .amount(requestDto.getAmount())
-            .user(member)
+            .member(member)
             .product(product)
             .build();
     }
