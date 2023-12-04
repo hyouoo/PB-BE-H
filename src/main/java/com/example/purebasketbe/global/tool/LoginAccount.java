@@ -9,6 +9,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 @SuppressWarnings("ALL")
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-@AuthenticationPrincipal(expression = "account")
+@AuthenticationPrincipal(expression = "member")
 public @interface LoginAccount {
 }
