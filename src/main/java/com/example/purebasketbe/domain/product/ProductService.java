@@ -30,7 +30,7 @@ public class ProductService {
     private int pageSize;
     @Value("${aws.bucket.name}")
     private String bucket;
-    @Value("${spring.cloud.aws.s3.region}")
+    @Value("${spring.cloud.aws.region.static}")
     private String region;
 
     @Transactional
