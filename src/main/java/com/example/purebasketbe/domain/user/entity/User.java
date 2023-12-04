@@ -1,6 +1,6 @@
-package com.example.purebasketbe.domain.member.entity;
+package com.example.purebasketbe.domain.user.entity;
 
-import com.example.purebasketbe.domain.member.dto.SignupRequestDto;
+import com.example.purebasketbe.domain.user.dto.SignupRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "member")
+@Table(name = "user")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +38,7 @@ public class Member {
     private boolean deleted = false;
 
     @Builder
-    private Member(String email, String password, String phone, String address, boolean deleted){
+    private User(String email, String password, String phone, String address, boolean deleted){
         this.email = email;
         this.password = password;
         this.phone = phone;
@@ -46,13 +46,13 @@ public class Member {
         this.deleted = deleted;
     }
 
-    public static Member of(SignupRequestDto requestDto, String password){
-        return Member.builder()
-            .email(requestDto.email())
+    public static User of(SignupRequestDto requestDto, String password){
+        return User.builder()
+            .email(requestDto.getEmail())
             .password(password)
-            .phone(requestDto.phone())
-            .address(requestDto.address())
-            .deleted(requestDto.deleted())
+            .phone(requestDto.getPhone())
+            .address(requestDto.getAddress())
+            .deleted(requestDto.isDeleted())
             .build();
     }
 }
