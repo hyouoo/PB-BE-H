@@ -96,8 +96,3 @@ public class Product {
         this.stock -= amount;
     }
 }
-
-
-
-
-
