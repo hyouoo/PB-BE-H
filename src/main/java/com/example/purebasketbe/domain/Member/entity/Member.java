@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "user")
+@Table(name = "member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +38,7 @@ public class User {
     private boolean deleted = false;
 
     @Builder
-    private User(String email, String password, String phone, String address, boolean deleted){
+    private Member(String email, String password, String phone, String address, boolean deleted){
         this.email = email;
         this.password = password;
         this.phone = phone;
@@ -46,13 +46,13 @@ public class User {
         this.deleted = deleted;
     }
 
-    public static User of(SignupRequestDto requestDto, String password){
-        return User.builder()
-            .email(requestDto.getEmail())
+    public static Member of(SignupRequestDto requestDto, String password){
+        return Member.builder()
+            .email(requestDto.email())
             .password(password)
-            .phone(requestDto.getPhone())
-            .address(requestDto.getAddress())
-            .deleted(requestDto.isDeleted())
+            .phone(requestDto.phone())
+            .address(requestDto.address())
+            .deleted(requestDto.deleted())
             .build();
     }
 }

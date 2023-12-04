@@ -1,7 +1,7 @@
 package com.example.purebasketbe.domain.purchase.entity;
 
 import com.example.purebasketbe.domain.product.entity.Product;
-import com.example.purebasketbe.domain.Member.entity.User;
+import com.example.purebasketbe.domain.Member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,17 +35,17 @@ public class Purchase extends TimeStamp{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
 
     @Builder
-    private Purchase(int amount, int price, User user, Product product) {
+    private Purchase(int amount, int price, Member member, Product product) {
         this.amount = amount;
         this.price = price;
-        this.user = user;
+        this.member = member;
         this.product = product;
     }
 
