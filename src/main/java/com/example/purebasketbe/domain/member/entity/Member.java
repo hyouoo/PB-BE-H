@@ -1,6 +1,6 @@
-package com.example.purebasketbe.domain.Member.entity;
+package com.example.purebasketbe.domain.member.entity;
 
-import com.example.purebasketbe.domain.Member.dto.SignupRequestDto;
+import com.example.purebasketbe.domain.member.dto.SignupRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -2,7 +2,7 @@ package com.example.purebasketbe.domain.cart.entity;
 
 import com.example.purebasketbe.domain.cart.dto.CartRequestDto;
 import com.example.purebasketbe.domain.product.entity.Product;
-import com.example.purebasketbe.domain.Member.entity.Member;
+import com.example.purebasketbe.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

@@ -1,4 +1,4 @@
-package com.example.purebasketbe.domain.Member.dto;
+package com.example.purebasketbe.domain.member.dto;
 
 public record LoginRequestDto (
     String email,

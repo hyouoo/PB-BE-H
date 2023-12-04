@@ -1,9 +1,8 @@
-package com.example.purebasketbe.domain.Member.dto;
+package com.example.purebasketbe.domain.member.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 
 public record SignupRequestDto (
         @NotBlank(message = "이름을 입력해주세요")

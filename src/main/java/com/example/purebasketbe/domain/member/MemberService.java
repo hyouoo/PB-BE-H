@@ -1,4 +1,4 @@
-package com.example.purebasketbe.domain.Member;
+package com.example.purebasketbe.domain.member;
 
 import org.springframework.stereotype.Service;
 
