@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class PurchaseHistoryDto {
+public class PurchaseHistoryResponseDto {
     private final Long productId;
     private final String  name;
     private final int amount;
@@ -16,7 +16,7 @@ public class PurchaseHistoryDto {
     private final LocalDateTime purchasedAt;
 
     @Builder
-    private PurchaseHistoryDto(Long productId, String name, int amount, int price, int totalPrice, LocalDateTime purchasedAt) {
+    private PurchaseHistoryResponseDto(Long productId, String name, int amount, int price, int totalPrice, LocalDateTime purchasedAt) {
         this.productId = productId;
         this.name = name;
         this.amount = amount;
@@ -25,8 +25,8 @@ public class PurchaseHistoryDto {
         this.purchasedAt = purchasedAt;
     }
 
-    public static PurchaseHistoryDto of(Product product, Purchase purchase) {
-        return PurchaseHistoryDto.builder()
+    public static PurchaseHistoryResponseDto of(Product product, Purchase purchase) {
+        return PurchaseHistoryResponseDto.builder()
             .productId(product.getId())
             .name(product.getName())
             .amount(purchase.getAmount())
