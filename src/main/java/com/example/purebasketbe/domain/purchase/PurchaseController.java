@@ -1,8 +1,8 @@
 package com.example.purebasketbe.domain.purchase;
 
+import com.example.purebasketbe.domain.member.entity.Member;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseHistoryDto;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto;
-import com.example.purebasketbe.domain.user.entity.User;
 import com.example.purebasketbe.global.tool.LoginAccount;
 import java.net.URI;
 import java.util.List;
@@ -24,15 +24,15 @@ public class PurchaseController {
 
     @PostMapping
     public ResponseEntity<Void> purchaseProducts(@RequestBody PurchaseRequestDto purchaseRequestDto,
-                                                  @LoginAccount User user) {
-        purchaseService.purchaseProducts(purchaseRequestDto.getPurchaseList(), user);
+                                                  @LoginAccount Member member) {
+        purchaseService.purchaseProducts(purchaseRequestDto.getPurchaseList(), member);
         return ResponseEntity.status(HttpStatus.CREATED).location(URI.create("")).build();
     }
 
     @GetMapping("/histories")
-    public ResponseEntity<List<PurchaseHistoryDto>> getPurchaseHistory(@LoginAccount User user) {
+    public ResponseEntity<List<PurchaseHistoryDto>> getPurchaseHistory(@LoginAccount Member member) {
 
-        List<PurchaseHistoryDto> responseBody = purchaseService.getPurchaseHistory(user);
+        List<PurchaseHistoryDto> responseBody = purchaseService.getPurchaseHistory(member);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 }

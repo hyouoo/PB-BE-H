@@ -2,8 +2,12 @@ package com.example.purebasketbe.domain.product;
 
 import com.example.purebasketbe.domain.product.entity.Event;
 import com.example.purebasketbe.domain.product.entity.Product;
+<<<<<<< HEAD
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+=======
+import java.util.List;
+>>>>>>> 421f3cf (Update: Purchase entity 수정 [#4])
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -19,4 +23,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "where p.deleted =:isDeleted AND p.event = :event")
     Page<Product> findAllByDeletedAndEvent(boolean isDeleted, Event event, Pageable pageable);
 
+    List<Product> findByIdIn(List<Long> requestIds);
 }

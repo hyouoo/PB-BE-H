@@ -84,5 +84,7 @@ public class Product {
         this.category = requestDto.getCategory() == null ? this.category : requestDto.getCategory();
         this.event = requestDto.getEvent() == null ? this.event : requestDto.getEvent();
         this.discountRate = requestDto.getDiscountRate() == null ? this.discountRate : requestDto.getDiscountRate();
+
     }
+
 }
