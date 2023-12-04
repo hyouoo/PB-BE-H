@@ -20,24 +20,16 @@ public class ProductRequestDto {
     @NotBlank(message = "상품명을 입력해 주세요.")
     private String name;
 
-<<<<<<< HEAD
     @PositiveOrZero(message = "가격을 0이상으로 입력해 주세요.")
     private Integer price;
 
     @PositiveOrZero(message = "재고를 0이상으로 입력해 주세요.")
-=======
-    @Min(value = 0, message = "가격을 0이상으로 입력해 주세요.")
-    private Integer price;
 
-    @Min(value = 0, message = "재고를 0이상으로 입력해 주세요.")
->>>>>>> edce372 (Fix: Rebase Conflict 해결)
     private Integer stock;
 
     private String info;
 
     private String category;
-
-    private Integer discountRate;
 
     @Enumerated(EnumType.STRING)
     private Event event;
