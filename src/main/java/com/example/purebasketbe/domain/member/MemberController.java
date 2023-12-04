@@ -1,10 +1,10 @@
-package com.example.purebasketbe.domain.user;
+package com.example.purebasketbe.domain.member;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class UserController {
+public class MemberController {
 
 }
