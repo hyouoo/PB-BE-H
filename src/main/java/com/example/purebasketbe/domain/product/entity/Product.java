@@ -1,19 +1,15 @@
 package com.example.purebasketbe.domain.product.entity;
 
 import com.example.purebasketbe.domain.product.dto.ProductRequestDto;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -28,10 +24,10 @@ public class Product {
     private String name;
 
     @Column(nullable = false)
-    private int price;
+    private Integer price;
 
     @Column(nullable = false)
-    private int quantity;
+    private Integer stock;
 
     private String info;
 
@@ -39,7 +35,9 @@ public class Product {
 
     private Event event;
 
-    private int count;
+    private Integer discountRate;
+
+    private Integer salesCount;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -51,29 +49,40 @@ public class Product {
     private boolean deleted;
 
     @Builder
-    private Product(String name, int price, int quantity, String info, String category, Event event) {
+    private Product(String name, Integer price, Integer stock, String info,
+                    String category, Event event, Integer discountRate) {
         this.name = name;
         this.price = price;
-        this.quantity = quantity;
+        this.stock = stock;
         this.info = info;
         this.category = category;
         this.event = event;
-        count = 0;
-        createdAt = LocalDateTime.now();
-        modifiedAt = LocalDateTime.now();
-        deleted = false;
+        this.discountRate = discountRate;
+        this.salesCount = 0;
+        this.createdAt = LocalDateTime.now();
+        this.modifiedAt = LocalDateTime.now();
+        this.deleted = false;
     }
 
     public static Product from(ProductRequestDto requestDto) {
         return Product.builder()
-            .name(requestDto.getName())
-            .price(requestDto.getPrice())
-            .quantity(requestDto.getQuantity())
-            .info(requestDto.getInfo())
-            .category(requestDto.getCategory())
-            .event(requestDto.getEvent())
-            .build();
+                .name(requestDto.getName())
+                .price(requestDto.getPrice())
+                .stock(requestDto.getStock())
+                .info(requestDto.getInfo())
+                .category(requestDto.getCategory())
+                .event(requestDto.getEvent())
+                .discountRate(requestDto.getDiscountRate())
+                .build();
     }
 
-
+    public void update(ProductRequestDto requestDto) {
+        this.name = requestDto.getName() == null ? this.name : requestDto.getName();
+        this.price = requestDto.getPrice() == null ? this.price : requestDto.getPrice();
+        this.stock = requestDto.getStock() == null ? this.stock : this.stock + requestDto.getStock();
+        this.info = requestDto.getInfo() == null ? this.info : requestDto.getInfo();
+        this.category = requestDto.getCategory() == null ? this.category : requestDto.getCategory();
+        this.event = requestDto.getEvent() == null ? this.event : requestDto.getEvent();
+        this.discountRate = requestDto.getDiscountRate() == null ? this.discountRate : requestDto.getDiscountRate();
+    }
 }
