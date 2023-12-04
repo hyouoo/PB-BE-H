@@ -24,6 +24,7 @@ public class ProductRequestDto {
     private Integer price;
 
     @PositiveOrZero(message = "재고를 0이상으로 입력해 주세요.")
+
     private Integer stock;
 
     private String info;
