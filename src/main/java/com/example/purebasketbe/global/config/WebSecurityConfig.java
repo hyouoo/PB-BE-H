@@ -31,7 +31,10 @@ import java.util.List;
 public class WebSecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
-            "/api/auth/**"
+        "/graphiql", "/graphql",
+        "/swagger-ui/**", "/api-docs", "/swagger-ui-custom.html",
+        "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
+        "/api/auth/**"
     };
 
 
@@ -72,11 +75,15 @@ public class WebSecurityConfig {
         // 접근 권한 설정
         http.authorizeHttpRequests((authorizeHttpRequests) ->
 
-                authorizeHttpRequests
-                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers(AUTH_WHITELIST).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/stores/**").permitAll()
-                        .anyRequest().authenticated());
+//                authorizeHttpRequests
+//                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+//                        .requestMatchers(AUTH_WHITELIST).permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/api/stores/**").permitAll()
+//                        .anyRequest().authenticated());
+            authorizeHttpRequests
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                .requestMatchers(AUTH_WHITELIST).permitAll()
+                .anyRequest().permitAll());
 
 
         // 필터 -> 순서 중요
