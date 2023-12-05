@@ -55,11 +55,11 @@ public class Purchase extends TimeStamp{
 
     public static Purchase of(Product product, int amount, Member member) {
         return Purchase.builder()
-            .name(product.getName())
-            .amount(amount)
-            .price(product.getPrice())
-            .member(member)
-            .product(product)
-            .build();
+                .name(product.getName())
+                .amount(amount)
+                .price(product.getPrice())
+                .member(member)
+                .product(product)
+                .build();
     }
 }

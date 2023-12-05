@@ -9,9 +9,6 @@ import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto.PurchaseD
 import com.example.purebasketbe.domain.purchase.entity.Purchase;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +17,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,13 +37,13 @@ public class PurchaseService {
     public void purchaseProducts(final List<PurchaseDetail> purchaseRequestDto, Member member) {
         int size = purchaseRequestDto.size();
         List<PurchaseDetail> sortedPurchaseDetailList = purchaseRequestDto.stream()
-            .sorted(Comparator.comparing(PurchaseDetail::getProductId)).toList();
+                .sorted(Comparator.comparing(PurchaseDetail::getProductId)).toList();
         List<Long> requestIds = sortedPurchaseDetailList.stream().map(PurchaseDetail::getProductId).toList();
         List<Product> validProductList = productRepository.findByIdIn(requestIds);
         validateProducts(size, validProductList);
 
         List<Integer> amountList = sortedPurchaseDetailList.stream()
-            .map(PurchaseDetail::getAmount).toList();
+                .map(PurchaseDetail::getAmount).toList();
 
         List<Purchase> purchaseList = new ArrayList<>();
 
@@ -97,7 +98,7 @@ public class PurchaseService {
 
     private Product getProductById(Long id) {
         return productRepository.findById(id).orElseThrow(
-            () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
+                () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
         );
     }
 }

@@ -19,7 +19,7 @@ public class PurchaseController {
 
     @PostMapping
     public ResponseEntity<Void> purchaseProducts(@RequestBody PurchaseRequestDto purchaseRequestDto,
-                                                  @AuthenticationPrincipal Member member) {
+                                                 @AuthenticationPrincipal Member member) {
         purchaseService.purchaseProducts(purchaseRequestDto.getPurchaseList(), member);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -27,8 +27,8 @@ public class PurchaseController {
 
     @GetMapping("/histories")
     public ResponseEntity<Page<PurchaseHistoryResponseDto>> getPurchaseHistory(
-        @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue="purchasedAt") String sortBy,
-        @RequestParam(defaultValue = "desc") String order, @AuthenticationPrincipal Member member) {
+            @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue="purchasedAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String order, @AuthenticationPrincipal Member member) {
         Page<PurchaseHistoryResponseDto> responseBody = purchaseService.getPurchaseHistory(member, page - 1, sortBy, order);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }

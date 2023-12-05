@@ -1,8 +1,8 @@
 package com.example.purebasketbe.domain.cart.entity;
 
 import com.example.purebasketbe.domain.cart.dto.CartRequestDto;
-import com.example.purebasketbe.domain.product.entity.Product;
 import com.example.purebasketbe.domain.member.entity.Member;
+import com.example.purebasketbe.domain.product.entity.Product;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -46,11 +46,16 @@ public class Cart {
         this.product = product;
     }
 
+    public void updateCart(CartRequestDto requestDto)
+    {
+        this.amount = amount;
+    }
+
     public static Cart of(CartRequestDto requestDto, Member member, Product product) {
         return Cart.builder()
-            .amount(requestDto.getAmount())
-            .member(member)
-            .product(product)
-            .build();
+                .amount(requestDto.getAmount())
+                .member(member)
+                .product(product)
+                .build();
     }
 }
