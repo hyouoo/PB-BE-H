@@ -1,5 +1,7 @@
 package com.example.purebasketbe.global.security.filter;
 
+import com.example.purebasketbe.global.exception.CustomException;
+import com.example.purebasketbe.global.exception.ErrorCode;
 import com.example.purebasketbe.global.security.impl.UserDetailsServiceImpl;
 import com.example.purebasketbe.global.security.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -19,6 +21,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
@@ -30,21 +33,30 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Override
     @SuppressWarnings("NullableProblems")
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain)
-                                    throws ServletException, IOException {
-        String token = jwtUtil.getTokenFromRequest(req);
+            throws ServletException, IOException {
+        try{
+            if (req.getHeader(JwtUtil.AUTHORIZATION_HEADER) == null)
+                throw new CustomException(ErrorCode.NOT_FOUND_TOKEN);
+            String token = URLDecoder.decode(req.getHeader(JwtUtil.AUTHORIZATION_HEADER), "UTF-8");
 
-        if (StringUtils.hasText(token)) {
+            if (StringUtils.hasText(token) && token != null) {
 
-            String tokenValue = jwtUtil.substringToken(token);
-            logger.info("토큰 확인용 : " + tokenValue);
-            if (!jwtUtil.validateToken(tokenValue)) {
-                return;
+                String tokenValue = jwtUtil.substringToken(token);
+                logger.error("토큰 확인용 : "+tokenValue);
+                jwtUtil.validateToken(tokenValue);
+
+                Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
+
+                try {
+                    setAuthentication(info.getSubject());
+                } catch (Exception e) {
+                    logger.error("인증오류!!!!");
+                }
             }
-            Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
-
-            setAuthentication(info.getSubject());
+        }catch (Exception e){
+            req.setAttribute("exception",e);
         }
-        logger.info(req.getRequestURI());
+        logger.error(req.getRequestURI());
         filterChain.doFilter(req, res);
     }
 
