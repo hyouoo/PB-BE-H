@@ -4,7 +4,7 @@ import com.example.purebasketbe.domain.cart.CartRepository;
 import com.example.purebasketbe.domain.member.entity.Member;
 import com.example.purebasketbe.domain.product.ProductRepository;
 import com.example.purebasketbe.domain.product.entity.Product;
-import com.example.purebasketbe.domain.purchase.dto.PurchaseHistoryResponseDto;
+import com.example.purebasketbe.domain.purchase.dto.PurchaseResponseDto;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto.PurchaseDetail;
 import com.example.purebasketbe.domain.purchase.entity.Purchase;
 import com.example.purebasketbe.global.exception.CustomException;
@@ -68,7 +68,7 @@ public class PurchaseService {
 
     @Transactional(readOnly = true)
 
-    public Page<PurchaseHistoryResponseDto> getPurchaseHistory(Member member, int page, String sortBy, String order) {
+    public Page<PurchaseResponseDto> getPurchases(Member member, int page, String sortBy, String order) {
 
         Sort.Direction direction = Direction.valueOf(order.toUpperCase());
         Sort sort = Sort.by(direction, sortBy);
@@ -76,11 +76,9 @@ public class PurchaseService {
 
         Page<Purchase> purchases = purchaseRepository.findAllByMember(member, pageable);
 
-        // Product table에서 soft delete하므로 purchase에 있는 product는 항상 존재함
-        // Product의 CascadeType.REMOVE
         return purchases.map(purchase -> {
             Product product = getProductById(purchase.getProduct().getId());
-            return PurchaseHistoryResponseDto.of(product, purchase);
+            return PurchaseResponseDto.of(product, purchase);
         });
     }
 

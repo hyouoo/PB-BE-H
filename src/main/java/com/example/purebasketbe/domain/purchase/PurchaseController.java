@@ -1,7 +1,7 @@
 package com.example.purebasketbe.domain.purchase;
 
 import com.example.purebasketbe.domain.member.entity.Member;
-import com.example.purebasketbe.domain.purchase.dto.PurchaseHistoryResponseDto;
+import com.example.purebasketbe.domain.purchase.dto.PurchaseResponseDto;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,10 +26,11 @@ public class PurchaseController {
     }
 
     @GetMapping("/histories")
-    public ResponseEntity<Page<PurchaseHistoryResponseDto>> getPurchaseHistory(
-            @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue="purchasedAt") String sortBy,
+
+    public ResponseEntity<Page<PurchaseResponseDto>> getPurchases(
+            @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "purchasedAt") String sortBy,
             @RequestParam(defaultValue = "desc") String order, @AuthenticationPrincipal Member member) {
-        Page<PurchaseHistoryResponseDto> responseBody = purchaseService.getPurchaseHistory(member, page - 1, sortBy, order);
+        Page<PurchaseResponseDto> responseBody = purchaseService.getPurchases(member, page - 1, sortBy, order);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 }

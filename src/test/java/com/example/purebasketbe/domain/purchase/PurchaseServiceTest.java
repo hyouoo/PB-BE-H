@@ -9,7 +9,7 @@ import com.example.purebasketbe.domain.cart.CartRepository;
 import com.example.purebasketbe.domain.member.entity.Member;
 import com.example.purebasketbe.domain.product.ProductRepository;
 import com.example.purebasketbe.domain.product.entity.Product;
-import com.example.purebasketbe.domain.purchase.dto.PurchaseHistoryResponseDto;
+import com.example.purebasketbe.domain.purchase.dto.PurchaseResponseDto;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto.PurchaseDetail;
 import com.example.purebasketbe.domain.purchase.entity.Purchase;
 import com.example.purebasketbe.global.exception.CustomException;
@@ -112,7 +112,7 @@ class PurchaseServiceTest {
             given(productRepository.findById(any())).willReturn(Optional.of(product));
 
             // when
-            Page<PurchaseHistoryResponseDto> result = purchaseService.getPurchaseHistory(member, page, sortBy, order);
+            Page<PurchaseResponseDto> result = purchaseService.getPurchases(member, page, sortBy, order);
 
             // then
             assertThat(result.getTotalPages()).isEqualTo(2);
@@ -148,7 +148,7 @@ class PurchaseServiceTest {
 
             // when
             Exception exception = assertThrows(CustomException.class,
-                () -> purchaseService.getPurchaseHistory(member, page, sortBy, order));
+                () -> purchaseService.getPurchases(member, page, sortBy, order));
 
             // then
             assertThat(exception.getMessage()).isEqualTo(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
