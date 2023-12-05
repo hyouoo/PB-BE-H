@@ -3,6 +3,7 @@ package com.example.purebasketbe.domain.purchase;
 import com.example.purebasketbe.domain.member.entity.Member;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseResponseDto;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto;
+import com.example.purebasketbe.global.tool.LoginAccount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -19,17 +20,17 @@ public class PurchaseController {
 
     @PostMapping
     public ResponseEntity<Void> purchaseProducts(@RequestBody PurchaseRequestDto purchaseRequestDto,
-                                                 @AuthenticationPrincipal Member member) {
+                                                  @LoginAccount Member member) {
         purchaseService.purchaseProducts(purchaseRequestDto.getPurchaseList(), member);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/histories")
 
+    @GetMapping
     public ResponseEntity<Page<PurchaseResponseDto>> getPurchases(
-            @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "purchasedAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String order, @AuthenticationPrincipal Member member) {
+        @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue="purchasedAt") String sortBy,
+        @RequestParam(defaultValue = "desc") String order, @LoginAccount Member member) {
         Page<PurchaseResponseDto> responseBody = purchaseService.getPurchases(member, page - 1, sortBy, order);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
