@@ -1,6 +1,5 @@
 package com.example.purebasketbe.domain.recipe;
 
-import com.example.purebasketbe.domain.recipe.dto.RecipeDetailResponseDto;
 import com.example.purebasketbe.domain.recipe.dto.RecipeResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,11 +21,9 @@ public class RecipeController {
     }
 
     @GetMapping("/{recipeId}")
-    public ResponseEntity<RecipeDetailResponseDto> getRecipe(@PathVariable Long recipeId) {
-        RecipeDetailResponseDto responseBody = recipeService.getRecipe(recipeId);
+    public ResponseEntity<RecipeResponseDto> getRecipe(@PathVariable Long recipeId) {
+        RecipeResponseDto responseBody = recipeService.getRecipe(recipeId);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
-
-
 
 }

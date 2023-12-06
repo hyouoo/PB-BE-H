@@ -26,8 +26,6 @@ public class Recipe {
     @Column
     private String imgUrl;
 
-    // ToDo: image 추가하기
-
     @OneToMany(mappedBy = "recipe")
     @OrderBy("product.id asc")
     private List<RecipeProduct> recipeProductList = new ArrayList<>();

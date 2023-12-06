@@ -1,7 +1,6 @@
 package com.example.purebasketbe.domain.recipe;
 
 import com.example.purebasketbe.domain.product.entity.Product;
-import com.example.purebasketbe.domain.recipe.dto.RecipeDetailResponseDto;
 import com.example.purebasketbe.domain.recipe.dto.RecipeResponseDto;
 import com.example.purebasketbe.domain.recipe.entity.Recipe;
 import com.example.purebasketbe.domain.recipe.entity.RecipeProduct;
@@ -34,13 +33,13 @@ public class RecipeService {
     }
 
     @Transactional(readOnly = true)
-    public RecipeDetailResponseDto getRecipe(Long recipeId) {
+    public RecipeResponseDto getRecipe(Long recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(
                 () -> new CustomException(ErrorCode.RECIPE_NOT_FOUND));
         List<Product> productList = recipe.getRecipeProductList().stream()
                 .map(RecipeProduct::getProduct).toList();
 
-        return RecipeDetailResponseDto.of(recipe, productList);
+        return RecipeResponseDto.of(recipe, productList);
 
     }
 }
