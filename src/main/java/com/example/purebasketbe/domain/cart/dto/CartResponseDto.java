@@ -8,16 +8,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CartResponseDto {
-    private final Long id;
-    private final String name;
-    private final int price;
-    private final int amount;
-    private final String category;
-    private final String imageUrl;
-
+    private Long id;
+    private String name;
+    private int price;
+    private int amount;
+    private String category;
+    private String imageUrl;
     @Builder
-    public CartResponseDto(Long id, String name, int price, int amount, String category, String imageUrl) {
+    private CartResponseDto(Long id, String name, int price, int amount, String category, String imageUrl) {
         this.id = id;
         this.name = name;
         this.price = price;

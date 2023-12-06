@@ -32,7 +32,7 @@ public class Cart {
     private int amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -58,4 +58,13 @@ public class Cart {
                 .product(product)
                 .build();
     }
+
+    public static Cart of(Product product, Member member) {
+        return Cart.builder()
+                .amount(1)
+                .member(member)
+                .product(product)
+                .build();
+    }
+
 }
