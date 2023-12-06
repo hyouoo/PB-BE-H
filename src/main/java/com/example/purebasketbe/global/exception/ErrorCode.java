@@ -28,6 +28,7 @@ public enum ErrorCode {
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 상품입니다."),
     NOT_ENOUGH_PRODUCT(HttpStatus.NOT_FOUND.value(), "상품 재고가 부족합니다."),
     RECIPE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 레시피입니다."),
+    RECIPE_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "이미 존재하는 레시피입니다."),
 
     PHONENUMBER_ALREADY_EXISTS(HttpStatus.CONTINUE.value(), "이미 등록된 전화번호입니다."),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED.value(), "토큰이 만료되었습니다."),
