@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -69,5 +70,12 @@ public class CartController {
             return new ResponseEntity<>("해당하는 상품이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/recipes/{recipeId}")
+    public ResponseEntity<Void> addRecipeRelatedProductsToCart(@PathVariable Long recipeId,
+                                                               @LoginAccount Member member) {
+        cartService.addRecipeRelatedProductsToCarts(recipeId, member);
+        return ResponseEntity.status(HttpStatus.CREATED).location(URI.create("/api/carts")).build();
     }
 }

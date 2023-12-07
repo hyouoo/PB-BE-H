@@ -10,6 +10,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -48,6 +50,10 @@ public class Product {
 
     @Column(nullable = false)
     private boolean deleted;
+
+    @OneToMany(mappedBy = "product")
+    private List<Image> images = new ArrayList<>();;
+
 
     @Builder
     private Product(String name, Integer price, Integer stock, String info,
