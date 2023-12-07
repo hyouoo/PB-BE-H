@@ -18,7 +18,6 @@ import java.util.List;
 @Table(name = "product")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,6 +35,7 @@ public class Product {
 
     private String category;
 
+    @Enumerated(EnumType.STRING)
     private Event event;
 
     private Integer discountRate;
@@ -73,26 +73,32 @@ public class Product {
 
     public static Product from(ProductRequestDto requestDto) {
         return Product.builder()
-                .name(requestDto.getName())
-                .price(requestDto.getPrice())
-                .stock(requestDto.getStock())
-                .info(requestDto.getInfo())
-                .category(requestDto.getCategory())
-                .event(requestDto.getEvent())
-                .discountRate(requestDto.getDiscountRate())
+                .name(requestDto.name())
+                .price(requestDto.price())
+                .stock(requestDto.stock())
+                .info(requestDto.info())
+                .category(requestDto.category())
+                .event(requestDto.event())
+                .discountRate(requestDto.discountRate())
                 .build();
     }
 
     public void update(ProductRequestDto requestDto) {
-        this.name = requestDto.getName() == null ? this.name : requestDto.getName();
-        this.price = requestDto.getPrice() == null ? this.price : requestDto.getPrice();
-        this.stock = requestDto.getStock() == null ? this.stock : this.stock + requestDto.getStock();
-        this.info = requestDto.getInfo() == null ? this.info : requestDto.getInfo();
-        this.category = requestDto.getCategory() == null ? this.category : requestDto.getCategory();
-        this.event = requestDto.getEvent() == null ? this.event : requestDto.getEvent();
-        this.discountRate = requestDto.getDiscountRate() == null ? this.discountRate : requestDto.getDiscountRate();
+        this.name = requestDto.name() == null ? this.name : requestDto.name();
+        this.price = requestDto.price() == null ? this.price : requestDto.price();
+        this.stock = requestDto.stock() == null ? this.stock : this.stock + requestDto.stock();
+        this.info = requestDto.info() == null ? this.info : requestDto.info();
+        this.category = requestDto.category() == null ? this.category : requestDto.category();
+        this.event = requestDto.event() == null ? this.event : requestDto.event();
+        this.discountRate = requestDto.discountRate() == null ? this.discountRate : requestDto.discountRate();
+        this.modifiedAt = LocalDateTime.now();
     }
 
+    public void softDelete() {
+        this.name += "-deleted";
+        this.modifiedAt = LocalDateTime.now();
+        this.deleted = true;
+    }
 
     public void incrementSalesCount(int amount) {
         this.salesCount += amount;

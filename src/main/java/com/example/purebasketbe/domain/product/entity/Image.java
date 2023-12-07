@@ -16,9 +16,6 @@ public class Image {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
     private String imgUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -26,15 +23,13 @@ public class Image {
     private Product product;
 
     @Builder
-    private Image(String name, String imgUrl, Product product) {
-        this.name = name;
+    private Image(String imgUrl, Product product) {
         this.imgUrl = imgUrl;
         this.product = product;
     }
 
-    public static Image of(String name, String imgUrl, Product product) {
+    public static Image of(String imgUrl, Product product) {
         return Image.builder()
-                .name(name)
                 .imgUrl(imgUrl)
                 .product(product)
                 .build();
