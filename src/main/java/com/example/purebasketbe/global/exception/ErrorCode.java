@@ -12,8 +12,10 @@ public enum ErrorCode {
     PASSWORD_DIFFERENT_FORMAT(HttpStatus.BAD_REQUEST.value(), "비밀번호는 8~15자리로, 알파벳 대소문자, 숫자, 특수문자를 포함해야 합니다."),
     PRODUCT_ALREADY_EXISTS(HttpStatus.CONTINUE.value(), "이미 등록된 물건입니다."),
     EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "이미 등록된 이메일입니다."),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 회원은 존재하지 않습니다"),
     INVALID_EMAIL_PASSWORD(HttpStatus.BAD_REQUEST.value(), "이메일 또는 비밀번호가 정확하지 않습니다."),
 
+    UNABLE_TO_SEND_EMAIL(HttpStatus.BAD_REQUEST.value(), "이메일을 보낼 수 없습니다."),
 
     STORE_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "상점이 이미 등록되어있습니다."),
     MENU_ALREADY_EXIST(HttpStatus.CONFLICT.value(), "이미 존재하는 메뉴입니다."),
@@ -38,6 +40,7 @@ public enum ErrorCode {
     ACCESS_DENIED(HttpStatus.FORBIDDEN.value(), "접근 권한이 없습니다."),
     INSUFFICIENT_POINT(HttpStatus.BAD_REQUEST.value(), "포인트가 부족합니다."),
     ORDER_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "처리할 주문이 없습니다."),
+    NO_SUCH_ALGORITHM(HttpStatus.BAD_REQUEST.value(), "잘못된 요청"),
     UNEXPECTED_ERROR(443, "예상치 못한 오류가 발생했습니다."),;
 
     private final int httpStatus;
