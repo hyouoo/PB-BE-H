@@ -82,8 +82,9 @@ public class ProductService {
     }
 
     private void checkExistProductByName(String name) {
-        if (productRepository.existsByName(name))
+        if (productRepository.existsByName(name)) {
             throw new CustomException(ErrorCode.PRODUCT_ALREADY_EXISTS);
+        }
     }
 
     private Product findProduct(Long id) {
