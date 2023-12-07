@@ -22,6 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
@@ -37,12 +38,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         try{
             if (req.getHeader(JwtUtil.AUTHORIZATION_HEADER) == null)
                 throw new CustomException(ErrorCode.NOT_FOUND_TOKEN);
-            String token = URLDecoder.decode(req.getHeader(JwtUtil.AUTHORIZATION_HEADER), "UTF-8");
+            String token = URLDecoder.decode(req.getHeader(JwtUtil.AUTHORIZATION_HEADER), StandardCharsets.UTF_8);
 
-            if (StringUtils.hasText(token) && token != null) {
+            if (StringUtils.hasText(token)) {
 
                 String tokenValue = jwtUtil.substringToken(token);
-                logger.error("토큰 확인용 : "+tokenValue);
+                logger.info("토큰 확인용 : "+tokenValue);
                 jwtUtil.validateToken(tokenValue);
 
                 Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
@@ -56,7 +57,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }catch (Exception e){
             req.setAttribute("exception",e);
         }
-        logger.error(req.getRequestURI());
+        logger.info(req.getRequestURI());
         filterChain.doFilter(req, res);
     }
 
