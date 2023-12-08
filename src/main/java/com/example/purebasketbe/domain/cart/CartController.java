@@ -7,6 +7,7 @@ import com.example.purebasketbe.global.tool.LoginAccount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -20,7 +21,7 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping("/{productId}")
-    public ResponseEntity<Void> addToCart(@PathVariable Long productId, @RequestBody CartRequestDto requestDto,
+    public ResponseEntity<Void> addToCart(@PathVariable Long productId, @RequestBody @Validated CartRequestDto requestDto,
                                           @LoginAccount Member member) {
         cartService.addToCart(productId, requestDto, member);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -33,7 +34,7 @@ public class CartController {
     }
 
     @PutMapping("/{productId}")
-    public ResponseEntity<Void> updateCart(@PathVariable Long productId, @RequestBody CartRequestDto requestDto,
+    public ResponseEntity<Void> updateCart(@PathVariable Long productId, @RequestBody @Validated CartRequestDto requestDto,
                                            @LoginAccount Member member) {
         cartService.updateCart(productId, requestDto, member);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -49,6 +50,8 @@ public class CartController {
     public ResponseEntity<Void> addRecipeRelatedProductsToCart(@PathVariable Long recipeId,
                                                                @LoginAccount Member member) {
         cartService.addRecipeRelatedProductsToCarts(recipeId, member);
-        return ResponseEntity.status(HttpStatus.CREATED).location(URI.create("/api/carts")).build();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .location(URI.create("/api/carts"))
+                .build();
     }
 }

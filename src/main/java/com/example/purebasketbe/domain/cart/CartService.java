@@ -73,7 +73,7 @@ public class CartService {
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
         );
-        if (product.getStock() == 0 || product.isDeleted()) {
+        if (product.getStock() <= 0 || product.isDeleted()) {
             throw new CustomException(ErrorCode.NOT_ENOUGH_PRODUCT);
         }
         return product;
