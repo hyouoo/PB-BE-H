@@ -34,8 +34,8 @@ public class JwtUtil {
     public static final String AUTHORIZATION_KEY = "auth";
     // Token 식별자
     public static final String BEARER_PREFIX = "Bearer ";
-    // 토큰 만료시간
 
+    // 토큰 만료시간
     @Value("${jwt.secret.key}") // Base64 Encode 한 SecretKey
     private String secretKey;
 
@@ -74,16 +74,16 @@ public class JwtUtil {
         Date date = new Date();
 
         return BEARER_PREFIX +
-            Jwts.builder()
-                .setSubject(username) // 사용자 식별자값(ID)
-                .claim(AUTHORIZATION_KEY, role) // 사용자 권한
-                .setExpiration(new Date(date.getTime() + accessTokenExpirationMillis)) // 만료 시간
-                .setIssuedAt(date) // 발급일
-                .signWith(key, signatureAlgorithm) // 암호화 알고리즘
-                .compact(); //압축 후 생성
+                Jwts.builder()
+                        .setSubject(username) // 사용자 식별자값(ID)
+                        .claim(AUTHORIZATION_KEY, role) // 사용자 권한
+                        .setExpiration(new Date(date.getTime() + accessTokenExpirationMillis)) // 만료 시간
+                        .setIssuedAt(date) // 발급일
+                        .signWith(key, signatureAlgorithm) // 암호화 알고리즘
+                        .compact(); //압축 후 생성
     }
 
-    // 리프세쉬 토큰 생성
+    // 리프레쉬 토큰 생성
     public String createRefreshToken(String username, UserRole role) {
         Date date = new Date();
 
@@ -100,9 +100,9 @@ public class JwtUtil {
     public void addJwtToHeader(String header, String token, HttpServletResponse res) {
         try {
             token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
-            res.addHeader(header,token);
+            res.addHeader(header, token);
         } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage()+"헤더로 토큰 전달");
+            log.info(e.getMessage() + "헤더로 토큰 전달");
         }
     }
 
@@ -112,14 +112,14 @@ public class JwtUtil {
         if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
             return tokenValue.substring(7);
         }
-        logger.error("Not Found Token");
+        log.info("Not Found Token");
         throw new NullPointerException("Not Found Token");
     }
 
     // 토큰 검증
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);;
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
         } catch (MalformedJwtException e) {
             log.info("Invalid JWT token, 유효하지 않는 JWT 서명 입니다.");
             log.trace("Invalid JWT token trace = {e}", e);

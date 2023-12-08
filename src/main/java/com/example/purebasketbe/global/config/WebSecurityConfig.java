@@ -26,8 +26,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
-@RequiredArgsConstructor
 @EnableWebSecurity
+@RequiredArgsConstructor
 @EnableMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig {
 
@@ -77,15 +77,10 @@ public class WebSecurityConfig {
 
         // 접근 권한 설정
         http.authorizeHttpRequests((authorizeHttpRequests) ->
-
-//                authorizeHttpRequests
-//                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-//                        .requestMatchers(AUTH_WHITELIST).permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/stores/**").permitAll()
-//                        .anyRequest().authenticated());
             authorizeHttpRequests
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers(AUTH_WHITELIST).permitAll()
+                .requestMatchers("/api/backoffice/**").hasRole(("ADMIN"))
                 .anyRequest().permitAll());
 
 

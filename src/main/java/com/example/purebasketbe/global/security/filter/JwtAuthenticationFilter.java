@@ -64,7 +64,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             FilterChain chain, Authentication authResult)
             throws IOException {
 
-
         log.info("로그인 성공 및 JWT 생성");
 
         String email = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
