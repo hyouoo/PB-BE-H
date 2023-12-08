@@ -6,7 +6,6 @@ import com.example.purebasketbe.domain.recipe.dto.RecipeRequestDto;
 import com.example.purebasketbe.domain.recipe.dto.RecipeResponseDto;
 import com.example.purebasketbe.domain.recipe.entity.Recipe;
 import com.example.purebasketbe.domain.recipe.entity.RecipeProduct;
-import com.example.purebasketbe.domain.recipe.entity.RecipeProductRepository;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
 import io.awspring.cloud.s3.ObjectMetadata;
@@ -28,7 +27,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class RecipeService {
+
     private final RecipeRepository recipeRepository;
+    private final ProductRepository productRepository;
     private final S3Template s3Template;
 
     @Value("${aws.bucket.name}")
@@ -36,8 +37,6 @@ public class RecipeService {
     @Value("${spring.cloud.aws.region.static}")
     private String region;
     private final int RECIPES_PER_PAGE = 10;
-    private final ProductRepository productRepository;
-    private final RecipeProductRepository recipeProductRepository;
 
     @Transactional(readOnly = true)
     public Page<RecipeResponseDto> getRecipes(int page) {
@@ -72,7 +71,6 @@ public class RecipeService {
         }
 
         recipeRepository.save(recipe);
-
         // S3 저장은 commit이 된 이후에 수행되어야 한다.
         uploadImage(file, key);
     }
@@ -86,12 +84,8 @@ public class RecipeService {
         // ToDo: S3에서 사진 삭제하기 코드 추가
     }
 
-
-
-
     // ToDo: productService에 있는 메서드와 합친 후에 S3 관련 폴더 생성하기
     private void uploadImage(MultipartFile file, String key) {
-
         InputStream inputStream;
         try {
             inputStream = file.getInputStream();
@@ -100,9 +94,7 @@ public class RecipeService {
         }
         ObjectMetadata metadata = ObjectMetadata.builder().contentType("text/plain").build();
 
-
         s3Template.upload(bucket, key, inputStream, metadata);
-
     }
 
     private Product findValidProduct(Long productId) {
