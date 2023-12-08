@@ -69,10 +69,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String email = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getMember().getRole();
 
+
+
         String token = jwtUtil.createToken(email, role);
         String refreshToken = jwtUtil.createRefreshToken(email, role);
         jwtUtil.addJwtToHeader(JwtUtil.AUTHORIZATION_HEADER, token, response);
         jwtUtil.addJwtToHeader(JwtUtil.REFRESHTOKEN_HEADER,refreshToken,response);
+
+        // 리프레시 토큰 만료 여부 확인
+        if (jwtUtil.isRefreshTokenExpired(refreshToken)) {
+            response.setContentType("application/json;charsetUTF=8");
+            response.getWriter().write(objectMapper.writeValueAsString(new SimpleResponse("재로그인 필요")));
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
 
         // 로그인 성공시 Refresh Token Redis 저장 ( key = Email / value = Refresh Token )
         UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
