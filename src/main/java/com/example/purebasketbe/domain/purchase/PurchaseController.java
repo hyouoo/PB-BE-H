@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,9 +20,9 @@ public class PurchaseController {
     private final PurchaseService purchaseService;
 
     @PostMapping
-    public ResponseEntity<Void> purchaseProducts(@RequestBody PurchaseRequestDto purchaseRequestDto,
+    public ResponseEntity<Void> purchaseProducts(@RequestBody @Validated PurchaseRequestDto requestDto,
                                                   @LoginAccount Member member) {
-        purchaseService.purchaseProducts(purchaseRequestDto.getPurchaseList(), member);
+        purchaseService.purchaseProducts(requestDto.getPurchaseList(), member);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

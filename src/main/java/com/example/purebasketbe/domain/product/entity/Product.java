@@ -12,6 +12,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 
 @Entity
 @Getter
@@ -95,7 +97,7 @@ public class Product {
     }
 
     public void softDelete() {
-        this.name += "-deleted";
+        this.name += "-deleted-" + UUID.randomUUID();
         this.modifiedAt = LocalDateTime.now();
         this.deleted = true;
     }
