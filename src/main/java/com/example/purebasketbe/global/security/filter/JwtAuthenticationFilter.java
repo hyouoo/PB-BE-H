@@ -1,8 +1,10 @@
 package com.example.purebasketbe.global.security.filter;
 
+import com.example.purebasketbe.domain.member.MemberService;
 import com.example.purebasketbe.domain.member.dto.LoginRequestDto;
 import com.example.purebasketbe.domain.member.entity.Member;
 import com.example.purebasketbe.domain.member.entity.UserRole;
+import com.example.purebasketbe.global.redis.RedisService;
 import com.example.purebasketbe.global.security.impl.UserDetailsImpl;
 import com.example.purebasketbe.global.security.jwt.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,15 +19,20 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.time.Duration;
 
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final JwtUtil jwtUtil;
+    private final RedisService redisService;
+    private final MemberService memberService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, RedisService redisService, MemberService memberService) {
         this.jwtUtil = jwtUtil;
+        this.redisService = redisService;
+        this.memberService = memberService;
         setFilterProcessesUrl("/api/auth/login");
     }
 
@@ -37,7 +44,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         try {
             LoginRequestDto requestDto = objectMapper.readValue(request.getInputStream(), LoginRequestDto.class);
-
             log.info("Email: {}", requestDto.email());
 
             return getAuthenticationManager().authenticate(
@@ -65,7 +71,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getMember().getRole();
 
         String token = jwtUtil.createToken(email, role);
+        String refreshToken = jwtUtil.createRefreshToken(email, role);
         jwtUtil.addJwtToHeader(JwtUtil.AUTHORIZATION_HEADER, token, response);
+        jwtUtil.addJwtToHeader(JwtUtil.REFRESHTOKEN_HEADER,refreshToken,response);
+
+        // 로그인 성공시 Refresh Token Redis 저장 ( key = Email / value = Refresh Token )
+        UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
+        Member findMember = memberService.findMemberByEmail(userDetails.getUsername());
+        long refreshTokenExpirationMillis = jwtUtil.getRefreshTokenExpirationMillis();
+        redisService.setValues(findMember.getEmail(), refreshToken, Duration.ofMillis(refreshTokenExpirationMillis));
+
 
         // 성공 메시지와 토큰을 JSON 형식으로 응답에 추가
         response.setContentType("application/json;charset=UTF-8");

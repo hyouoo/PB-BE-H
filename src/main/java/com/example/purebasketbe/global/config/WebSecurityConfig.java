@@ -1,5 +1,7 @@
 package com.example.purebasketbe.global.config;
 
+import com.example.purebasketbe.domain.member.MemberService;
+import com.example.purebasketbe.global.redis.RedisService;
 import com.example.purebasketbe.global.security.filter.JwtAuthenticationFilter;
 import com.example.purebasketbe.global.security.filter.JwtAuthorizationFilter;
 import com.example.purebasketbe.global.security.impl.UserDetailsServiceImpl;
@@ -40,6 +42,8 @@ public class WebSecurityConfig {
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final RedisService redisService;
+    private final MemberService memberService;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -48,7 +52,7 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, redisService, memberService);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }
