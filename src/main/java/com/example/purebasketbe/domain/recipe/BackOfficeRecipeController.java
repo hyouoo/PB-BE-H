@@ -17,18 +17,18 @@ import java.net.URI;
 @RequiredArgsConstructor
 @RequestMapping("/api/backoffice/recipes")
 public class BackOfficeRecipeController {
+
     private final RecipeService recipeService;
 
     @GetMapping
     public ResponseEntity<Page<RecipeResponseDto>> getRecipes(@RequestParam(defaultValue = "1") int page) {
         Page<RecipeResponseDto> responseBody = recipeService.getRecipes(page - 1);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(responseBody);
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> registerRecipe(@RequestPart("requestDto") @Validated RecipeRequestDto requestDto,
-                                                @RequestPart("file") MultipartFile file) {
+                                               @RequestPart("file") MultipartFile file) {
         recipeService.registerRecipe(requestDto, file);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(URI.create("/api/backoffice/recipes"))
