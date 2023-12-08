@@ -3,15 +3,7 @@ package com.example.purebasketbe.domain.cart.entity;
 import com.example.purebasketbe.domain.cart.dto.CartRequestDto;
 import com.example.purebasketbe.domain.member.entity.Member;
 import com.example.purebasketbe.domain.product.entity.Product;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -46,25 +38,16 @@ public class Cart {
         this.product = product;
     }
 
-    public void updateCart(CartRequestDto requestDto)
-    {
-        this.amount = amount;
-    }
-
-    public static Cart of(CartRequestDto requestDto, Member member, Product product) {
+    public static Cart of(Product product, Member member, CartRequestDto requestDto) {
+        int amount = requestDto == null ? 1 : requestDto.amount();
         return Cart.builder()
-                .amount(requestDto.getAmount())
+                .amount(amount)
                 .member(member)
                 .product(product)
                 .build();
     }
 
-    public static Cart of(Product product, Member member) {
-        return Cart.builder()
-                .amount(1)
-                .member(member)
-                .product(product)
-                .build();
+    public void changeAmount(CartRequestDto requestDto) {
+        this.amount = requestDto.amount();
     }
-
 }

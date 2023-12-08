@@ -25,6 +25,8 @@ public enum ErrorCode {
 
     ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 사용자를 찾을 수 없습니다."),
 
+    INVALID_CART_ITEM(HttpStatus.BAD_REQUEST.value(), "장바구니에 없는 상품입니다."),
+
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 상품입니다."),
     NOT_ENOUGH_PRODUCT(HttpStatus.NOT_FOUND.value(), "상품 재고가 부족합니다."),
     RECIPE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 레시피입니다."),
