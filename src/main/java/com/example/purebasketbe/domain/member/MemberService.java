@@ -31,4 +31,8 @@ public class MemberService {
         }
     }
 
+    public Member findMemberByEmail(String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.EMAIL_NOT_FOUND));
+    }
 }
