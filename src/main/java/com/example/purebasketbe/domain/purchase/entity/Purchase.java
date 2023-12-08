@@ -1,17 +1,8 @@
 package com.example.purebasketbe.domain.purchase.entity;
 
+import com.example.purebasketbe.domain.member.entity.Member;
 import com.example.purebasketbe.domain.product.entity.Product;
-import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto;
-import com.example.purebasketbe.domain.user.entity.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -27,6 +18,9 @@ public class Purchase extends TimeStamp{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private String name;
+
     @Min(value = 1)
     @Column(nullable = false)
     private int amount;
@@ -35,23 +29,29 @@ public class Purchase extends TimeStamp{
     private int price;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
 
     @Builder
-    private Purchase(int amount, int price, User user, Product product) {
+    private Purchase(String name, int amount, int price, Member member, Product product) {
+        this.name = name;
         this.amount = amount;
         this.price = price;
-        this.user = user;
+        this.member = member;
         this.product = product;
     }
 
-//    public static Purchase from(PurchaseRequestDto requestDto) {
-//        return Purchase.builder()
-//            .amount(requestDto.)
-//    }
+    public static Purchase of(Product product, int amount, Member member) {
+        return Purchase.builder()
+                .name(product.getName())
+                .amount(amount)
+                .price(product.getPrice())
+                .member(member)
+                .product(product)
+                .build();
+    }
 }

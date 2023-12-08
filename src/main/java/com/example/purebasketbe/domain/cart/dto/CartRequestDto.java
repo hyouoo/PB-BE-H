@@ -1,11 +1,10 @@
 package com.example.purebasketbe.domain.cart.dto;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.Min;
 
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CartRequestDto {
-    private int amount;
+public record CartRequestDto(
+
+        @Min(value = 1, message = "1이상의 값을 입력해 주세요.")
+        int amount
+) {
 }

@@ -21,8 +21,16 @@ public enum ErrorCode {
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "먼저 업장등록을 해주세요"),
     NEGATIVE_PRICE_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED.value(), "잘못된 가격표기법 입니다."),
     IMAGE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST.value(), "이미지 업로드 오류"),
+    INVALID_IMAGE(HttpStatus.BAD_REQUEST.value(), "잘못된 이미지입니다."),
 
     ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 사용자를 찾을 수 없습니다."),
+
+    INVALID_CART_ITEM(HttpStatus.BAD_REQUEST.value(), "장바구니에 없는 상품입니다."),
+
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 상품입니다."),
+    NOT_ENOUGH_PRODUCT(HttpStatus.NOT_FOUND.value(), "상품 재고가 부족합니다."),
+    RECIPE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 레시피입니다."),
+    RECIPE_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "이미 존재하는 레시피입니다."),
 
     PHONENUMBER_ALREADY_EXISTS(HttpStatus.CONTINUE.value(), "이미 등록된 전화번호입니다."),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED.value(), "토큰이 만료되었습니다."),
