@@ -10,7 +10,6 @@ import com.example.purebasketbe.domain.product.entity.Image;
 import com.example.purebasketbe.domain.product.entity.Product;
 import com.example.purebasketbe.domain.recipe.RecipeRepository;
 import com.example.purebasketbe.domain.recipe.entity.Recipe;
-import com.example.purebasketbe.domain.recipe.entity.RecipeProduct;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +62,7 @@ public class CartService {
                 new CustomException(ErrorCode.RECIPE_NOT_FOUND)
         );
 
-        List<Product> productList = recipe.getRecipeProductList().stream().map(RecipeProduct::getProduct).toList();
+        List<Product> productList = recipe.getProductList();
         cartRepository.deleteAllByMemberAndProductIn(member, productList);
         List<Cart> cartList = productList.stream().map(product -> Cart.of(product, member, null)).toList();
         cartRepository.saveAll(cartList);
