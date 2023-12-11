@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -15,16 +17,17 @@ public class ProductResponseDto {
 
     private Long id;
     private String name;
-    private Integer price;
-    private Integer stock;
+    private int price;
+    private int stock;
     private String info;
     private String category;
     private Event event;
-    private Integer discountRate;
+    private int discountRate;
+    private List<String> images;
 
     @Builder
-    ProductResponseDto(Long id, String name, Integer price, Integer stock, String info,
-                       String category, Event event, Integer discountRate) {
+    ProductResponseDto(Long id, String name, int price, int stock, String info,
+                       String category, Event event, int discountRate) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -46,5 +49,15 @@ public class ProductResponseDto {
                 .event(product.getEvent())
                 .discountRate(product.getDiscountRate())
                 .build();
+    }
+
+    public static ProductResponseDto of(Product product, List<String> imgUrlLsit) {
+        ProductResponseDto productResponseDto = ProductResponseDto.from(product);
+        productResponseDto.addImgUrls(imgUrlLsit);
+        return productResponseDto;
+    }
+
+    private void addImgUrls(List<String> imgUrlList) {
+        this.images = imgUrlList;
     }
 }
