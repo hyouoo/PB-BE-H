@@ -1,7 +1,7 @@
 package com.example.purebasketbe.domain.product;
 
 import com.example.purebasketbe.domain.product.dto.ProductListResponseDto;
-import com.example.purebasketbe.domain.product.dto.ProductDetailResponseDto;
+import com.example.purebasketbe.domain.product.dto.ProductResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +33,8 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductDetailResponseDto> getProduct(@PathVariable Long productId) {
-        ProductDetailResponseDto responseBody = productService.getProduct(productId);
+    public ResponseEntity<ProductResponseDto> getProduct(@PathVariable Long productId) {
+        ProductResponseDto responseBody = productService.getProduct(productId);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 }

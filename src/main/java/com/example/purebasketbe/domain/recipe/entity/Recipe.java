@@ -1,5 +1,6 @@
 package com.example.purebasketbe.domain.recipe.entity;
 
+import com.example.purebasketbe.domain.product.entity.Product;
 import com.example.purebasketbe.domain.recipe.dto.RecipeRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -28,16 +29,20 @@ public class Recipe {
     @Column
     private String imgUrl;
 
-    @OneToMany(mappedBy = "recipe", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    @OrderBy("product.id asc")
-    private List<RecipeProduct> recipeProductList;
+
+    @ManyToMany
+    @JoinTable(name = "recipe_product",
+                joinColumns = @JoinColumn(name = "recipe_id"),
+                inverseJoinColumns = @JoinColumn(name = "product_id"))
+    private List<Product> productList = new ArrayList<>();
+
 
     @Builder
-    private Recipe(String name, String info, String imgUrl, List<RecipeProduct> recipeProductList) {
+    private Recipe(String name, String info, String imgUrl, List<Product> productList) {
         this.name = name;
         this.info = info;
         this.imgUrl = imgUrl;
-        this.recipeProductList = recipeProductList;
+        this.productList = productList;
     }
 
     public static Recipe from(RecipeRequestDto requestDto, String imgUrl) {
@@ -45,13 +50,12 @@ public class Recipe {
                 .name(requestDto.getName())
                 .info(requestDto.getInfo())
                 .imgUrl(imgUrl)
-                .recipeProductList(new ArrayList<>())
+                .productList(new ArrayList<>())
                 .build();
     }
 
-    public void addRecipeProduct(RecipeProduct recipeProduct) {
-        this.recipeProductList.add(recipeProduct);
-        recipeProduct.addRecipe(this);
+    public void addProduct(Product product) {
+        this.productList.add(product);
     }
 }
 

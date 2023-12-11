@@ -5,7 +5,6 @@ import com.example.purebasketbe.domain.product.entity.Product;
 import com.example.purebasketbe.domain.recipe.dto.RecipeRequestDto;
 import com.example.purebasketbe.domain.recipe.dto.RecipeResponseDto;
 import com.example.purebasketbe.domain.recipe.entity.Recipe;
-import com.example.purebasketbe.domain.recipe.entity.RecipeProduct;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
 import com.example.purebasketbe.global.s3.S3Handler;
@@ -42,8 +41,7 @@ public class RecipeService {
     public RecipeResponseDto getRecipe(Long recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(
                 () -> new CustomException(ErrorCode.RECIPE_NOT_FOUND));
-        List<Product> productList = recipe.getRecipeProductList().stream()
-                .map(RecipeProduct::getProduct).toList();
+        List<Product> productList = recipe.getProductList();
 
         return RecipeResponseDto.of(recipe, productList);
     }
@@ -56,8 +54,7 @@ public class RecipeService {
         Recipe recipe = Recipe.from(requestDto, imgUrl);
         for (Long productId : requestDto.getProductIdList()) {
             Product product = findValidProduct(productId);
-            RecipeProduct recipeProduct = RecipeProduct.of(recipe, product);
-            recipe.addRecipeProduct(recipeProduct);
+            recipe.addProduct(product);
         }
 
         recipeRepository.save(recipe);

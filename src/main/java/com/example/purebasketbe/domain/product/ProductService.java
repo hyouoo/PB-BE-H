@@ -32,16 +32,15 @@ public class ProductService {
     @Transactional(readOnly = true)
     public ProductListResponseDto getProducts(int eventPage, int page) {
         Pageable eventPageable = getPageable(eventPage, eventPageSize);
-        Page<Product> eventProducts = productRepository.findAllByDeletedAndEvent(false, Event.DISCOUNT, eventPageable);
-        Page<ProductResponseDto> eventProductsResponse = eventProducts.map(ProductResponseDto::from);
-        List<ImageResponseDto> eventImageUrlResponse = getImageUrlResponse(eventProducts);
-
         Pageable pageable = getPageable(page, pageSize);
-        Page<Product> products = productRepository.findAllByDeletedAndEvent(false, Event.NORMAL, pageable);
-        Page<ProductResponseDto> productsResponse = products.map(ProductResponseDto::from);
-        List<ImageResponseDto> imageUrlResponse = getImageUrlResponse(products);
 
-        return ProductListResponseDto.of(eventProductsResponse, eventImageUrlResponse, productsResponse, imageUrlResponse);
+        Page<Product> eventProducts = productRepository.findAllByDeletedAndEvent(false, Event.DISCOUNT, eventPageable);
+        Page<Product> products = productRepository.findAllByDeletedAndEvent(false, Event.NORMAL, pageable);
+
+        Page<ProductResponseDto> eventProductsResponse = getResponseDtoFromProducts(eventProducts);
+        Page<ProductResponseDto> productsResponse = getResponseDtoFromProducts(products);
+
+        return ProductListResponseDto.of(eventProductsResponse, productsResponse);
     }
 
     @Transactional(readOnly = true)
@@ -49,32 +48,31 @@ public class ProductService {
         Pageable eventPageable = getPageable(eventPage, eventPageSize);
         Pageable pageable = getPageable(page, pageSize);
 
-        Page<Product> eventProducts;
-        Page<Product> products;
-        if (category.isEmpty()) {
-            eventProducts = productRepository.findAllByDeletedAndEventAndNameContains(
-                    false, Event.DISCOUNT, query, eventPageable);
-            products = productRepository.findAllByDeletedAndEventAndNameContains(
-                    false, Event.NORMAL, query, pageable);
-        } else {
-            eventProducts = productRepository.findAllByDeletedAndEventAndCategoryAndNameContains(
-                    false, Event.DISCOUNT, category, query, eventPageable);
-            products = productRepository.findAllByDeletedAndEventAndCategoryAndNameContains(
-                    false, Event.NORMAL, category, query, pageable);
-        }
-        Page<ProductResponseDto> eventProductsResponse = eventProducts.map(ProductResponseDto::from);
-        List<ImageResponseDto> eventImageUrlResponse = getImageUrlResponse(eventProducts);
-        Page<ProductResponseDto> productsResponse = products.map(ProductResponseDto::from);
-        List<ImageResponseDto> imageUrlResponse = getImageUrlResponse(products);
 
-        return ProductListResponseDto.of(eventProductsResponse, eventImageUrlResponse, productsResponse, imageUrlResponse);
+        Page<Product> eventProducts = category.isEmpty()
+                ? productRepository.findAllByDeletedAndEventAndNameContains(
+                false, Event.DISCOUNT, query, eventPageable)
+                : productRepository.findAllByDeletedAndEventAndCategoryAndNameContains(
+                false, Event.DISCOUNT, category, query, eventPageable);
+
+        Page<Product> products = category.isEmpty()
+                ? productRepository.findAllByDeletedAndEventAndNameContains(
+                false, Event.NORMAL, query, pageable)
+                : productRepository.findAllByDeletedAndEventAndCategoryAndNameContains(
+                false, Event.NORMAL, category, query, pageable);
+
+        Page<ProductResponseDto> eventProductsResponse = getResponseDtoFromProducts(eventProducts);
+        Page<ProductResponseDto> productsResponse = getResponseDtoFromProducts(products);
+
+        return ProductListResponseDto.of(eventProductsResponse, productsResponse);
     }
 
+
     @Transactional(readOnly = true)
-    public ProductDetailResponseDto getProduct(Long productId) {
+    public ProductResponseDto getProduct(Long productId) {
         Product product = findProduct(productId);
         List<String> imageUrlList = getImgUrlList(product);
-        return ProductDetailResponseDto.of(product, imageUrlList);
+        return ProductResponseDto.of(product, imageUrlList);
     }
 
     @Transactional
@@ -105,18 +103,16 @@ public class ProductService {
         imageRepository.deleteAllByProductId(productId);
     }
 
+    private Page<ProductResponseDto> getResponseDtoFromProducts(Page<Product> products) {
+        return products.map(product -> {
+            List<String> imgUrlList = getImgUrlList(product);
+            return ProductResponseDto.of(product, imgUrlList);
+        });
+    }
+
     private Pageable getPageable(int page, int pageSize) {
         Sort sort = Sort.by(Sort.Direction.DESC, "modifiedAt");
         return PageRequest.of(page, pageSize, sort);
-    }
-
-    private List<ImageResponseDto> getImageUrlResponse(Page<Product> products) {
-        List<ImageResponseDto> imageUrlResponse = new ArrayList<>();
-        for (Product product : products) {
-            List<String> imgUrlList = getImgUrlList(product);
-            imageUrlResponse.add(ImageResponseDto.of(product, imgUrlList));
-        }
-        return imageUrlResponse;
     }
 
     private List<String> getImgUrlList(Product product) {

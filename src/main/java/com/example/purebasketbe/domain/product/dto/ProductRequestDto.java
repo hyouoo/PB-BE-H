@@ -23,7 +23,6 @@ public record ProductRequestDto(
 
         String category,
 
-        @Enumerated(EnumType.STRING)
         Event event,
 
         @Min(value = 0, message = "할인율은 0 이상으로 입력해 주세요.")
