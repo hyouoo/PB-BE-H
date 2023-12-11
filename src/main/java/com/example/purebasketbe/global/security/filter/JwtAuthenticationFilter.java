@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -72,23 +73,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 
         String token = jwtUtil.createToken(email, role);
-        String refreshToken = jwtUtil.createRefreshToken(email, role);
+        String refreshToken = jwtUtil.createRefreshToken(email);
         jwtUtil.addJwtToHeader(JwtUtil.AUTHORIZATION_HEADER, token, response);
         jwtUtil.addJwtToHeader(JwtUtil.REFRESHTOKEN_HEADER,refreshToken,response);
-
-        // 리프레시 토큰 만료 여부 확인
-        if (jwtUtil.isRefreshTokenExpired(refreshToken)) {
-            response.setContentType("application/json;charsetUTF=8");
-            response.getWriter().write(objectMapper.writeValueAsString(new SimpleResponse("재로그인 필요")));
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        }
 
         // 로그인 성공시 Refresh Token Redis 저장 ( key = Email / value = Refresh Token )
         UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
         Member findMember = memberService.findMemberByEmail(userDetails.getUsername());
         long refreshTokenExpirationMillis = jwtUtil.getRefreshTokenExpirationMillis();
         redisService.setValues(findMember.getEmail(), refreshToken, Duration.ofMillis(refreshTokenExpirationMillis));
-
 
         // 성공 메시지와 토큰을 JSON 형식으로 응답에 추가
         response.setContentType("application/json;charset=UTF-8");

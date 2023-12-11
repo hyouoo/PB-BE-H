@@ -4,23 +4,19 @@ import com.example.purebasketbe.domain.member.entity.UserRole;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 
 @Slf4j
@@ -50,23 +46,11 @@ public class JwtUtil {
     private Key key;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
-    // 로그 설정
-    public static final Logger logger = LoggerFactory.getLogger("JWT 관련 로그");
-
     // Bean 등록후 Key SecretKey HS256 decode
     @PostConstruct
     public void init() {
-        String base64EncodedSecretKey = encodeBase64SecretKey(this.secretKey);
-        this.key = getKeyFromBase64EncodedKey(base64EncodedSecretKey);
-    }
-
-    public String encodeBase64SecretKey(String secretKey) {
-        return Encoders.BASE64.encode(secretKey.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private Key getKeyFromBase64EncodedKey(String base64EncodedSecretKey) {
-        byte[] keyBytes = Decoders.BASE64.decode(base64EncodedSecretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
+        byte[] bytes = Base64.getDecoder().decode(secretKey);
+        key = Keys.hmacShaKeyFor(bytes);
     }
 
     // 토큰 생성
@@ -84,7 +68,7 @@ public class JwtUtil {
     }
 
     // 리프레쉬 토큰 생성
-    public String createRefreshToken(String username, UserRole role) {
+    public String createRefreshToken(String username) {
         Date date = new Date();
 
         return BEARER_PREFIX +
@@ -122,30 +106,21 @@ public class JwtUtil {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
         } catch (MalformedJwtException e) {
             log.info("Invalid JWT token, 유효하지 않는 JWT 서명 입니다.");
-            log.trace("Invalid JWT token trace = {e}", e);
+            log.trace("Invalid JWT token trace = {}", e);
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT token, 만료된 JWT token 입니다.");
-            log.trace("Expired JWT token trace = {e}", e);
+            log.trace("Expired JWT token trace = {}", e);
             throw new CustomException(ErrorCode.TOKEN_EXPIRED);
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
-            log.trace("Unsupported JWT token trace = {e}", e);
+            log.trace("Unsupported JWT token trace = {}", e);
             throw new CustomException(ErrorCode.TOKEN_UNSUPPORTED);
         } catch (IllegalArgumentException e) {
             log.info("JWT claims string is empty, 잘못된 JWT 토큰 입니다.");
-            log.trace("JWT claims string is empty trace = {e}", e);
+            log.trace("JWT claims string is empty trace = {}", e);
             throw new CustomException(ErrorCode.TOKEN_INVALID);
         }
         return true;
-    }
-
-    public boolean isRefreshTokenExpired(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return false;
-        } catch (ExpiredJwtException e) {
-            return true;
-        }
     }
 
     // 토큰에서 사용자 정보 가져오기
