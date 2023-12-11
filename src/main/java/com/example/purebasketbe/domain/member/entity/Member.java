@@ -1,6 +1,7 @@
 package com.example.purebasketbe.domain.member.entity;
 
 import com.example.purebasketbe.domain.member.dto.SignupRequestDto;
+import com.example.purebasketbe.global.tool.LoginAccount;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -16,6 +17,9 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private String name;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -37,8 +41,9 @@ public class Member {
     private boolean deleted = false;
 
     @Builder
-    private Member(String email, String password, String phone, String address, UserRole role, boolean deleted){
+    private Member(String email, String name, String password, String phone, String address, UserRole role, boolean deleted){
         this.email = email;
+        this.name = name;
         this.password = password;
         this.phone = phone;
         this.address = address;
@@ -47,12 +52,12 @@ public class Member {
 
     public static Member of(SignupRequestDto requestDto, String password){
         return Member.builder()
+            .name(requestDto.name())
             .email(requestDto.email())
             .password(password)
             .phone(requestDto.phone())
             .address(requestDto.address())
             .role(UserRole.MEMBER)
-            .deleted(requestDto.deleted())
             .build();
     }
 }

@@ -18,6 +18,5 @@ public record SignupRequestDto (
         String address,
         @NotBlank(message = "전화번호를 입력해주세요")
         @Pattern(regexp = "^[0-9]{10,11}$", message = "전화번호는 10~11자리의 숫자이어야 합니다")
-        String phone,
-        boolean deleted
+        String phone
 ){ }
