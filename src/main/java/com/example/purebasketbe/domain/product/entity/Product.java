@@ -28,10 +28,10 @@ public class Product {
     private String name;
 
     @Column(nullable = false)
-    private Integer price;
+    private int price;
 
     @Column(nullable = false)
-    private Integer stock;
+    private int stock;
 
     private String info;
 
@@ -40,9 +40,9 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private Event event;
 
-    private Integer discountRate;
+    private int discountRate;
 
-    private Integer salesCount;
+    private int salesCount;
 
     @CreatedDate
     private LocalDateTime createdAt;
