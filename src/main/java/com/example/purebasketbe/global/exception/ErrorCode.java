@@ -49,6 +49,7 @@ public enum ErrorCode {
     ACCESS_DENIED(HttpStatus.FORBIDDEN.value(), "접근 권한이 없습니다."),
     INSUFFICIENT_POINT(HttpStatus.BAD_REQUEST.value(), "포인트가 부족합니다."),
     ORDER_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "처리할 주문이 없습니다."),
+    UNSUPPORTED_USER_TYPE(HttpStatus.BAD_REQUEST.value(), "잘못된 사용자 유형입니다."),
     UNEXPECTED_ERROR(443, "예상치 못한 오류가 발생했습니다."),;
 
     private final int httpStatus;
