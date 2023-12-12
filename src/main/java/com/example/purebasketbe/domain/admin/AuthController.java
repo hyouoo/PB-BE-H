@@ -30,6 +30,6 @@ public class AuthController {
         HttpHeaders headers = new HttpHeaders();
         headers.add(JwtUtil.AUTHORIZATION_HEADER, token);
         // 성공 메시지와 함께 응답 반환
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).headers(headers).build();
     }
 }
