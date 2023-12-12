@@ -72,9 +72,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String email = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
         Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-        UserRole role = UserRole.valueOf(authorities.iterator().next().getAuthority());
-
-
+        String authority = authorities.iterator().next().getAuthority();
+        UserRole role = UserRole.valueOf(authority.replace("ROLE_", ""));
 
         String token = jwtUtil.createToken(email, role);
         String refreshToken = jwtUtil.createRefreshToken(email);
