@@ -16,11 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Collection;
 
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -68,7 +70,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         log.info("로그인 성공 및 JWT 생성");
 
         String email = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
-        UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getMember().getRole();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
+        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+        UserRole role = UserRole.valueOf(authorities.iterator().next().getAuthority());
 
 
 
@@ -78,7 +82,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         jwtUtil.addJwtToHeader(JwtUtil.REFRESHTOKEN_HEADER,refreshToken,response);
 
         // 로그인 성공시 Refresh Token Redis 저장 ( key = Email / value = Refresh Token )
-        UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
         Member findMember = memberService.findMemberByEmail(userDetails.getUsername());
         long refreshTokenExpirationMillis = jwtUtil.getRefreshTokenExpirationMillis();
         redisService.setValues(findMember.getEmail(), refreshToken, Duration.ofMillis(refreshTokenExpirationMillis));
