@@ -95,9 +95,11 @@ jobs:
         timeout: 60s
         script: |
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pure-basket
-          sudo docker stop pure-basket-container
-          sudo docker rm pure-basket-container
-          sudo docker run --name pure-basket-container -it -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/pure-basket
+          # sudo docker stop pure-basket-container
+          # sudo docker rm pure-basket-container
+          sudo docker-compose -f down
+          sudo docker-compose up -d
+          # sudo docker run --name pure-basket-container -it -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/pure-basket
           sudo docker system prune -f
 
     # (12) REMOVE Github IP FROM security group
@@ -119,12 +121,12 @@ jobs:
       shell: bash
 
     # slack
-    - name: Slack Alarm
-      uses: 8398a7/action-slack@v3
-      with:
-          status: ${{ job.status }}
-          author_name: GitHub-Actions CI/CD # default: 8398a7@action-slack 
-          fields: repo,message,commit,author,action,eventName,workflow,ref,job,took
-      env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
-      if: always() # Pick up events even if the job fails or is canceled.
+    # - name: Slack Alarm
+    #   uses: 8398a7/action-slack@v3
+    #   with:
+    #       status: ${{ job.status }}
+    #       author_name: GitHub-Actions CI/CD # default: 8398a7@action-slack 
+    #       fields: repo,message,commit,author,action,eventName,workflow,ref,job,took
+    #   env:
+    #       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+    #   if: always() # Pick up events even if the job fails or is canceled.
