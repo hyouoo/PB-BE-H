@@ -30,7 +30,7 @@ public class PurchaseService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
 
-    private final int PRODUCTS_PER_PAGE = 20;
+    private final int PRODUCTS_PER_PAGE = 10;
 
     @Transactional
     public void purchaseProducts(final List<PurchaseDetail> purchaseRequestDto, Member member) {
