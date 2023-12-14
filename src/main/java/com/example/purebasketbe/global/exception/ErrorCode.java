@@ -11,7 +11,7 @@ public enum ErrorCode {
     EMAIL_DIFFERENT_FORMAT(HttpStatus.BAD_REQUEST.value(), "이메일 형식이 올바르지 않습니다."),
     EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "이메일을 찾을 수 없습니다"),
     PASSWORD_DIFFERENT_FORMAT(HttpStatus.BAD_REQUEST.value(), "비밀번호는 8~15자리로, 알파벳 대소문자, 숫자, 특수문자를 포함해야 합니다."),
-    PRODUCT_ALREADY_EXISTS(HttpStatus.CONTINUE.value(), "이미 등록된 물건입니다."),
+    PRODUCT_ALREADY_EXISTS(HttpStatus.BAD_REQUEST.value(), "이미 등록된 물건입니다."),
     EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "이미 등록된 이메일입니다."),
     INVALID_EMAIL_PASSWORD(HttpStatus.BAD_REQUEST.value(), "이메일 또는 비밀번호가 정확하지 않습니다."),
 
@@ -27,6 +27,7 @@ public enum ErrorCode {
     ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 사용자를 찾을 수 없습니다."),
 
     INVALID_CART_ITEM(HttpStatus.BAD_REQUEST.value(), "장바구니에 없는 상품입니다."),
+    PRODUCT_ALREADY_ADDED(HttpStatus.BAD_REQUEST.value(), "이미 장바구니에 등록된 상품입니다."),
 
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 상품입니다."),
     NOT_ENOUGH_PRODUCT(HttpStatus.NOT_FOUND.value(), "상품 재고가 부족합니다."),
@@ -50,7 +51,7 @@ public enum ErrorCode {
     INSUFFICIENT_POINT(HttpStatus.BAD_REQUEST.value(), "포인트가 부족합니다."),
     ORDER_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "처리할 주문이 없습니다."),
     UNSUPPORTED_USER_TYPE(HttpStatus.BAD_REQUEST.value(), "잘못된 사용자 유형입니다."),
-    UNEXPECTED_ERROR(443, "예상치 못한 오류가 발생했습니다."),;
+    UNEXPECTED_ERROR(443, "예상치 못한 오류가 발생했습니다.");
 
     private final int httpStatus;
     private final String message;

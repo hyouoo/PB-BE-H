@@ -13,11 +13,13 @@ import com.example.purebasketbe.domain.recipe.entity.Recipe;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CartService {
@@ -30,6 +32,7 @@ public class CartService {
     @Transactional
     public void addToCart(Long productId, CartRequestDto requestDto, Member member) {
         Product product = findAndValidateProduct(productId);
+        chcekDuplicate(product);
         Cart newCart = Cart.of(product, member, requestDto);
         cartRepository.save(newCart);
     }
@@ -76,6 +79,12 @@ public class CartService {
             throw new CustomException(ErrorCode.NOT_ENOUGH_PRODUCT);
         }
         return product;
+    }
+
+    private void chcekDuplicate(Product product) {
+        if (cartRepository.existsProduct(product)) {
+            throw new CustomException(ErrorCode.PRODUCT_ALREADY_ADDED);
+        }
     }
 
     private Cart findAndValidateCart(Long productId, Member member) {

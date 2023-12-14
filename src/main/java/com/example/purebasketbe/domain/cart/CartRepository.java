@@ -14,6 +14,9 @@ import java.util.Optional;
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
 
+    @Query("select exists (select c.id from Cart c where c.product = :product)")
+    boolean existsProduct(Product product);
+
     @Modifying
     @Query("DELETE FROM Cart c WHERE c.member=:member AND c.product IN (:products)")
     void deleteByUserAndProductIn(Member member, List<Product> products);
