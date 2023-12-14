@@ -27,6 +27,7 @@ public enum ErrorCode {
     ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 사용자를 찾을 수 없습니다."),
 
     INVALID_CART_ITEM(HttpStatus.BAD_REQUEST.value(), "장바구니에 없는 상품입니다."),
+    PRODUCT_ALREADY_ADDED(HttpStatus.BAD_REQUEST.value(), "이미 장바구니에 등록된 상품입니다."),
 
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 상품입니다."),
     NOT_ENOUGH_PRODUCT(HttpStatus.NOT_FOUND.value(), "상품 재고가 부족합니다."),
@@ -50,7 +51,7 @@ public enum ErrorCode {
     INSUFFICIENT_POINT(HttpStatus.BAD_REQUEST.value(), "포인트가 부족합니다."),
     ORDER_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "처리할 주문이 없습니다."),
     UNSUPPORTED_USER_TYPE(HttpStatus.BAD_REQUEST.value(), "잘못된 사용자 유형입니다."),
-    UNEXPECTED_ERROR(443, "예상치 못한 오류가 발생했습니다."),;
+    UNEXPECTED_ERROR(443, "예상치 못한 오류가 발생했습니다.");
 
     private final int httpStatus;
     private final String message;
