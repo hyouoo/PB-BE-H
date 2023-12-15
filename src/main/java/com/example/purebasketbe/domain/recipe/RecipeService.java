@@ -52,7 +52,7 @@ public class RecipeService {
         String imgUrl = s3Handler.makeUrl(file);
 
         Recipe recipe = Recipe.from(requestDto, imgUrl);
-        for (Long productId : requestDto.getProductIdList()) {
+        for (Long productId : requestDto.productIdList()) {
             Product product = findValidProduct(productId);
             recipe.addProduct(product);
         }
@@ -77,7 +77,7 @@ public class RecipeService {
     }
 
     private void checkExistRecipeByName(RecipeRequestDto requestDto) {
-        if (recipeRepository.existsByName(requestDto.getName())) {
+        if (recipeRepository.existsByName(requestDto.name())) {
             throw new CustomException(ErrorCode.RECIPE_ALREADY_EXISTS);
         }
     }

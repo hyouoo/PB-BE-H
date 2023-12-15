@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
-public record SignupRequestDto (
+public record SignupRequestDto(
         @NotBlank(message = "이름을 입력해주세요")
         String name,
         @NotBlank(message = "이메일을 입력해주세요")
@@ -19,4 +19,5 @@ public record SignupRequestDto (
         @NotBlank(message = "전화번호를 입력해주세요")
         @Pattern(regexp = "^[0-9]{10,11}$", message = "전화번호는 10~11자리의 숫자이어야 합니다")
         String phone
-){ }
+) {
+}

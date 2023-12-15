@@ -4,9 +4,10 @@ import com.example.purebasketbe.domain.cart.CartRepository;
 import com.example.purebasketbe.domain.member.entity.Member;
 import com.example.purebasketbe.domain.product.ProductRepository;
 import com.example.purebasketbe.domain.product.entity.Product;
-import com.example.purebasketbe.domain.purchase.dto.PurchaseResponseDto;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto.PurchaseDetail;
+import com.example.purebasketbe.domain.purchase.dto.PurchaseResponseDto;
 import com.example.purebasketbe.domain.purchase.entity.Purchase;
+import com.example.purebasketbe.domain.recipe.dto.RecipeResponseDto;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -35,15 +36,17 @@ public class PurchaseService {
     @Transactional
     public void purchaseProducts(final List<PurchaseDetail> purchaseRequestDto, Member member) {
         int size = purchaseRequestDto.size();
-        List<PurchaseDetail> sortedPurchaseDetailList = purchaseRequestDto.stream()
-                .sorted(Comparator.comparing(PurchaseDetail::getProductId)).toList();
-        List<Long> requestIds = sortedPurchaseDetailList.stream()
-                .map(PurchaseDetail::getProductId).toList();
 
-        List<Product> validProductList = productRepository.findByIdIn(requestIds);
+        List<PurchaseDetail> sortedPurchaseDetailList = purchaseRequestDto.stream()
+                .sorted(Comparator.comparing(PurchaseDetail::productId)).toList();
+        List<Long> requestIds = sortedPurchaseDetailList.stream()
+                .map(PurchaseDetail::productId).toList();
+
+
+        List<Product> validProductList = productRepository.findByIdInAndDeleted(requestIds, false);
         validateProducts(size, validProductList);
         List<Integer> amountList = sortedPurchaseDetailList.stream()
-                .map(PurchaseDetail::getAmount).toList();
+                .map(PurchaseDetail::amount).toList();
 
         List<Purchase> purchaseList = new ArrayList<>();
         for (int i = 0; i < size; i++) {

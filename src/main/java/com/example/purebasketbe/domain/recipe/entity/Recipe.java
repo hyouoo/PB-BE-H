@@ -47,8 +47,8 @@ public class Recipe {
 
     public static Recipe from(RecipeRequestDto requestDto, String imgUrl) {
         return Recipe.builder()
-                .name(requestDto.getName())
-                .info(requestDto.getInfo())
+                .name(requestDto.name())
+                .info(requestDto.info())
                 .imgUrl(imgUrl)
                 .productList(new ArrayList<>())
                 .build();

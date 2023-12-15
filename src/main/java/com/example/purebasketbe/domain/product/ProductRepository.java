@@ -25,4 +25,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByIdIn(List<Long> requestIds);
 
     Optional<Product> findByIdAndDeleted(Long productId, boolean isDeleted);
+
+    List<Product> findByIdInAndDeleted(List<Long> requestIds, boolean isDeleted);
 }
