@@ -39,7 +39,6 @@ public class CartService {
 
     @Transactional(readOnly = true)
     public List<CartResponseDto> getCartList(Member member) {
-        new CartResponseDto(1L, "", 1, "NORMAL", "sdf", 1);
         return cartRepository.findAllByMember(member).stream()
                 .map(cart -> {
                     Product product = findAndValidateProduct(cart.getProduct().getId());
