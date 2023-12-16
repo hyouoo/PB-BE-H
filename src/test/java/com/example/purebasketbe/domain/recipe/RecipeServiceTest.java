@@ -84,7 +84,7 @@ class RecipeServiceTest {
             Long recipeId = 1L;
             List<Product> productList = new ArrayList<>();
             Recipe recipe = Recipe.builder().name("test recipe").productList(productList).build();
-            given(recipeRepository.findById(any())).willReturn(Optional.of(recipe));
+            given(recipeRepository.findById(recipeId)).willReturn(Optional.of(recipe));
 
             // when
             RecipeResponseDto result = recipeService.getRecipe(recipeId);
@@ -100,7 +100,7 @@ class RecipeServiceTest {
         void getRecipeFail() {
             // given
             Long recipeId = 1L;
-            given(recipeRepository.findById(any())).willReturn(Optional.empty());
+            given(recipeRepository.findById(recipeId)).willReturn(Optional.empty());
 
             // when
             Exception exception = assertThrows(CustomException.class,
@@ -189,7 +189,7 @@ class RecipeServiceTest {
             // given
             Long recipeId = 1L;
             Recipe recipe = Recipe.builder().build();
-            given(recipeRepository.findById(any())).willReturn(Optional.of(recipe));
+            given(recipeRepository.findById(recipeId)).willReturn(Optional.of(recipe));
 
             // when
             recipeService.deleteRecipe(recipeId);
@@ -204,7 +204,7 @@ class RecipeServiceTest {
         void deleteRecipeFail() {
             // given
             Long recipeId = 1L;
-            given(recipeRepository.findById(any())).willReturn(Optional.empty());
+            given(recipeRepository.findById(recipeId)).willReturn(Optional.empty());
 
             // when
             Exception exception = assertThrows(CustomException.class,

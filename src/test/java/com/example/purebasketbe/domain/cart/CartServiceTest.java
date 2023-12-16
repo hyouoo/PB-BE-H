@@ -178,14 +178,13 @@ class CartServiceTest {
         @DisplayName("장바구니 업데이트 성공")
         void updateCartSuccess() {
             // given
-            Cart cart = mock(Cart.class);
+            Cart cart = Cart.builder().amount(1).build();
             given(cartRepository.findByProductIdAndMember(productId, member)).willReturn(Optional.of(cart));
-
             // when
             cartService.updateCart(productId, requestDto, member);
 
             // then
-            verify(cart).changeAmount(requestDto);
+            assertThat(cart.getAmount()).isEqualTo(requestDto.amount());
         }
 
         @Test
