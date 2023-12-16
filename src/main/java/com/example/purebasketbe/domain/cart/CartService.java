@@ -32,7 +32,7 @@ public class CartService {
     @Transactional
     public void addToCart(Long productId, CartRequestDto requestDto, Member member) {
         Product product = findAndValidateProduct(productId);
-        chcekDuplicate(product);
+        checkIfExist(product);
         Cart newCart = Cart.of(product, member, requestDto);
         cartRepository.save(newCart);
     }
@@ -45,7 +45,6 @@ public class CartService {
                     Image image = findImage(product.getId());
                     return CartResponseDto.of(product, image, cart);
                 }).toList();
-
     }
 
     @Transactional
@@ -62,27 +61,22 @@ public class CartService {
 
     @Transactional
     public void addRecipeRelatedProductsToCarts(Long recipeId, Member member) {
-        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
-                new CustomException(ErrorCode.RECIPE_NOT_FOUND)
-        );
+        Recipe recipe = getRecipeById(recipeId);
 
         List<Product> productList = recipe.getProductList();
         cartRepository.deleteAllByMemberAndProductIn(member, productList);
-        List<Cart> cartList = productList.stream().map(product -> Cart.of(product, member, null)).toList();
+        List<Cart> cartList = productList.stream().map(product -> Cart.of(product, member)).toList();
         cartRepository.saveAll(cartList);
     }
 
+
     private Product findAndValidateProduct(Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow(
+        return productRepository.findByIdAndDeleted(productId, false).orElseThrow(
                 () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
         );
-        if (product.getStock() <= 0 || product.isDeleted()) {
-            throw new CustomException(ErrorCode.NOT_ENOUGH_PRODUCT);
-        }
-        return product;
     }
 
-    private void chcekDuplicate(Product product) {
+    private void checkIfExist(Product product) {
         if (cartRepository.existsProduct(product)) {
             throw new CustomException(ErrorCode.PRODUCT_ALREADY_ADDED);
         }
@@ -97,5 +91,11 @@ public class CartService {
     private Image findImage(Long productId) {
         return imageRepository.findAllByProductId(productId).stream().findFirst()
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_IMAGE));
+    }
+
+    private Recipe getRecipeById(Long recipeId) {
+        return recipeRepository.findById(recipeId).orElseThrow(() ->
+                new CustomException(ErrorCode.RECIPE_NOT_FOUND)
+        );
     }
 }
