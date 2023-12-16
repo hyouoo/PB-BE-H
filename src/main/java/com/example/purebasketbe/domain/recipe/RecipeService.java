@@ -39,8 +39,7 @@ public class RecipeService {
 
     @Transactional(readOnly = true)
     public RecipeResponseDto getRecipe(Long recipeId) {
-        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(
-                () -> new CustomException(ErrorCode.RECIPE_NOT_FOUND));
+        Recipe recipe = getRecipeById(recipeId);
         List<Product> productList = recipe.getProductList();
 
         return RecipeResponseDto.of(recipe, productList);
@@ -63,11 +62,14 @@ public class RecipeService {
 
     @Transactional
     public void deleteRecipe(Long recipeId) {
-        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
-                new CustomException(ErrorCode.RECIPE_NOT_FOUND)
-        );
+        Recipe recipe = getRecipeById(recipeId);
         s3Handler.deleteImage(recipe.getImgUrl());
         recipeRepository.delete(recipe);
+    }
+
+    private Recipe getRecipeById(Long recipeId) {
+        return recipeRepository.findById(recipeId).orElseThrow(
+                () -> new CustomException(ErrorCode.RECIPE_NOT_FOUND));
     }
 
     private Product findValidProduct(Long productId) {
