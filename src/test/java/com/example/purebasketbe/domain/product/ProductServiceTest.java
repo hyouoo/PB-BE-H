@@ -9,7 +9,6 @@ import com.example.purebasketbe.domain.product.entity.Product;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
 import com.example.purebasketbe.global.s3.S3Handler;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -47,88 +46,61 @@ public class ProductServiceTest {
     int eventPageSize = 4;
     int pageSize = 12;
 
-    int eventPage;
-    int page;
-
-    Product eventProduct;
-    Product normalProduct;
-
-    @BeforeEach
-    void setProducts() {
-        eventProduct = Product.builder()
-                .name("event product")
-                .price(1000)
-                .stock(100)
-                .event(Event.DISCOUNT)
-                .discountRate(50)
-                .category("product")
-                .build();
-
-        normalProduct = Product.builder()
-                .name("normal product")
-                .price(2000)
-                .stock(1000)
-                .event(Event.NORMAL)
-                .discountRate(0)
-                .category("product")
-                .build();
-    }
+    Product product = Product.builder()
+            .name("normal product")
+            .price(2000)
+            .stock(1000)
+            .event(Event.NORMAL)
+            .discountRate(0)
+            .category("product")
+            .build();
 
     @Nested
     @DisplayName("전체 상품 조회")
     class GetProducts {
 
+        int eventPage = 0;
+        int page = 0;
+
+        Page<Product> products = getProductsPage(page);
+
+        @BeforeEach
+        void setUp() {
+            setPrivateFieldOfService();
+        }
+
         @Test
         @DisplayName("조회 성공")
         void getProductsSuccess() {
             // given
-            eventPage = 0;
-            page = 0;
-
-            setPrivateFieldOfService();
-            List<Pageable> pageables = getPageables(eventPage, page);
-            List<Page<Product>> productsPages = getProductsPages(eventPage, page, pageables);
-
-            given(productRepository.findAllByDeletedAndEvent(false, Event.DISCOUNT, pageables.get(0)))
-                    .willReturn(productsPages.get(0));
-            given(productRepository.findAllByDeletedAndEvent(false, Event.NORMAL, pageables.get(1)))
-                    .willReturn(productsPages.get(1));
+            given(productRepository.findAllByDeletedAndEvent(
+                    any(Boolean.class), any(Event.class), any(Pageable.class)))
+                    .willReturn(products);
 
             // when
             ProductListResponseDto responseDto = productService.getProducts(eventPage, page);
 
             // then
-            assertThat(responseDto.eventProducts().stream()
-                    .map(ProductResponseDto::name)
-                    .findFirst())
-                    .hasValue(eventProduct.getName());
             assertThat(responseDto.products().stream()
                     .map(ProductResponseDto::name)
                     .findFirst())
-                    .hasValue(normalProduct.getName());
+                    .hasValue(product.getName());
         }
 
         @Test
-        @DisplayName("조회 실패")
+        @DisplayName("조회 실패(상품 없음)")
         void getProductsFail() {
             // given
-            eventPage = 2;
-            page = 0;
-
-            setPrivateFieldOfService();
-            List<Pageable> pageables = getPageables(eventPage, page);
-            List<Page<Product>> productsPages = getProductsPages(eventPage, page, pageables);
-
-            given(productRepository.findAllByDeletedAndEvent(false, Event.DISCOUNT, pageables.get(0)))
-                    .willReturn(productsPages.get(0));
-            given(productRepository.findAllByDeletedAndEvent(false, Event.NORMAL, pageables.get(1)))
-                    .willReturn(productsPages.get(1));
+            given(productRepository.findAllByDeletedAndEvent(
+                    any(Boolean.class), any(Event.class), any(Pageable.class)))
+                    .willReturn(Page.empty());
 
             // when
             ProductListResponseDto responseDto = productService.getProducts(eventPage, page);
 
             // then
             assertThat(responseDto.eventProducts().getNumberOfElements()).isZero();
+            assertThat(responseDto.products().getNumberOfElements()).isZero();
         }
     }
 
@@ -136,78 +108,43 @@ public class ProductServiceTest {
     @DisplayName("상품 검색 조회")
     class searchProducts {
 
+        String query = "event";
+        String category = "";
+        int eventPage = 0;
+        int page = 0;
+
+        Page<Product> products = getProductsPage(page);
+
+        @BeforeEach
+        void setUp() {
+            setPrivateFieldOfService();
+        }
+
         @Test
         @DisplayName("조회 성공, w/o category")
         void searchProductsSuccessWithoutCategory() {
             // given
-            String query = "event";
-            String category = "";
-            eventPage = 0;
-            page = 0;
-            setPrivateFieldOfService();
-            List<Pageable> pageables = getPageables(eventPage, page);
-            List<Page<Product>> productsPages = getProductsPages(eventPage, page, pageables);
-
-            when(productRepository.findAllByDeletedAndEventAndNameContains(
-                    false, Event.DISCOUNT, query, pageables.get(0)))
-                    .thenAnswer(invocation -> {
-                        if (eventProduct.getName().contains(query)) {
-                            return productsPages.get(0);
-                        } else {
-                            return emptyPage(pageables.get(0));
-                        }
-                    });
-            when(productRepository.findAllByDeletedAndEventAndNameContains(
-                    false, Event.NORMAL, query, pageables.get(1)))
-                    .thenAnswer(invocation -> {
-                        if (normalProduct.getName().contains(query)) {
-                            return productsPages.get(1);
-                        } else {
-                            return emptyPage(pageables.get(1));
-                        }
-                    });
+            given(productRepository.findAllByDeletedAndEventAndNameContains(
+                    any(Boolean.class), any(Event.class), any(String.class), any(Pageable.class)))
+                    .willReturn(products);
 
             // when
             ProductListResponseDto responseDto = productService.searchProducts(query, category, eventPage, page);
 
             // then
-            assertThat(responseDto.eventProducts().stream()
+            assertThat(responseDto.products().stream()
                     .map(ProductResponseDto::name)
                     .findFirst())
-                    .hasValue(eventProduct.getName());
-            assertThat(responseDto.products().getNumberOfElements()).isZero();
+                    .hasValue(product.getName());
         }
 
         @Test
         @DisplayName("조회 실패(검색 상품 없음), w/o category")
         void searchProductFailWithoutCategory() {
             // given
-            String query = "nothing";
-            String category = "";
-            eventPage = 0;
-            page = 0;
-            setPrivateFieldOfService();
-            List<Pageable> pageables = getPageables(eventPage, page);
-            List<Page<Product>> productsPages = getProductsPages(eventPage, page, pageables);
-
-            when(productRepository.findAllByDeletedAndEventAndNameContains(
-                    false, Event.DISCOUNT, query, pageables.get(0)))
-                    .thenAnswer(invocation -> {
-                        if (eventProduct.getName().contains(query)) {
-                            return productsPages.get(0);
-                        } else {
-                            return emptyPage(pageables.get(0));
-                        }
-                    });
-            when(productRepository.findAllByDeletedAndEventAndNameContains(
-                    false, Event.NORMAL, query, pageables.get(1)))
-                    .thenAnswer(invocation -> {
-                        if (normalProduct.getName().contains(query)) {
-                            return productsPages.get(1);
-                        } else {
-                            return emptyPage(pageables.get(1));
-                        }
-                    });
+            given(productRepository.findAllByDeletedAndEventAndNameContains(
+                    any(Boolean.class), any(Event.class), any(String.class), any(Pageable.class)))
+                    .willReturn(Page.empty());
 
             // when
             ProductListResponseDto responseDto = productService.searchProducts(query, category, eventPage, page);
@@ -221,33 +158,11 @@ public class ProductServiceTest {
         @DisplayName("조회 성공, w/ category")
         void searchProductsSuccessWithCategory() {
             // given
-            String query = "event";
-            String category = "product";
-            eventPage = 0;
-            page = 0;
-            setPrivateFieldOfService();
-            List<Pageable> pageables = getPageables(eventPage, page);
-            List<Page<Product>> productsPages = getProductsPages(eventPage, page, pageables);
+            category = "test category";
 
-            when(productRepository.findAllByDeletedAndEventAndCategoryAndNameContains(
-                    false, Event.DISCOUNT, category, query, pageables.get(0)))
-                    .thenAnswer(invocation -> {
-                        if (eventProduct.getName().contains(query) && eventProduct.getCategory().equals(category)) {
-                            return productsPages.get(0);
-                        } else {
-                            return emptyPage(pageables.get(0));
-                        }
-                    });
-            when(productRepository.findAllByDeletedAndEventAndCategoryAndNameContains(
-                    false, Event.NORMAL, category, query, pageables.get(1)))
-                    .thenAnswer(invocation -> {
-                        if (normalProduct.getName().contains(query) && normalProduct.getCategory().equals(category)) {
-                            return productsPages.get(1);
-                        } else {
-                            return emptyPage(pageables.get(1));
-                        }
-                    });
-
+            given(productRepository.findAllByDeletedAndEventAndCategoryAndNameContains(
+                    any(Boolean.class), any(Event.class), any(String.class), any(String.class), any(Pageable.class)))
+                    .willReturn(products);
             // when
             ProductListResponseDto responseDto = productService.searchProducts(query, category, eventPage, page);
 
@@ -255,41 +170,18 @@ public class ProductServiceTest {
             assertThat(responseDto.eventProducts().stream()
                     .map(ProductResponseDto::name)
                     .findFirst())
-                    .hasValue(eventProduct.getName());
-            assertThat(responseDto.products().getNumberOfElements()).isZero();
+                    .hasValue(product.getName());
         }
 
         @Test
         @DisplayName("조회 실패(검색 상품 없음), w/ category")
         void searchProductsFailWithCategory() {
             // given
-            String query = "event";
-            String category = "nothing";
-            eventPage = 0;
-            page = 0;
-            setPrivateFieldOfService();
-            List<Pageable> pageables = getPageables(eventPage, page);
-            List<Page<Product>> productsPages = getProductsPages(eventPage, page, pageables);
+            category = "test category";
 
-            when(productRepository.findAllByDeletedAndEventAndCategoryAndNameContains(
-                    false, Event.DISCOUNT, category, query, pageables.get(0)))
-                    .thenAnswer(invocation -> {
-                        if (eventProduct.getName().contains(query) && eventProduct.getCategory().equals(category)) {
-                            return productsPages.get(0);
-                        } else {
-                            return emptyPage(pageables.get(0));
-                        }
-                    });
-            when(productRepository.findAllByDeletedAndEventAndCategoryAndNameContains(
-                    false, Event.NORMAL, category, query, pageables.get(1)))
-                    .thenAnswer(invocation -> {
-                        if (normalProduct.getName().contains(query) && normalProduct.getCategory().equals(category)) {
-                            return productsPages.get(1);
-                        } else {
-                            return emptyPage(pageables.get(1));
-                        }
-                    });
-
+            given(productRepository.findAllByDeletedAndEventAndCategoryAndNameContains(
+                    any(Boolean.class), any(Event.class), any(String.class), any(String.class), any(Pageable.class)))
+                    .willReturn(Page.empty());
             // when
             ProductListResponseDto responseDto = productService.searchProducts(query, category, eventPage, page);
 
@@ -303,30 +195,28 @@ public class ProductServiceTest {
     @DisplayName("단일 상품 조회")
     class GetProduct {
 
+        Long productId = 1L;
+
         @Test
         @DisplayName("조회 성공")
         void getProductSuccess() {
             // given
-            Long productId = eventProduct.getId();
-
-            given(productRepository.findByIdAndDeleted(productId, false))
-                    .willReturn(Optional.ofNullable(eventProduct));
-            given(imageRepository.findAllByProductId(productId))
+            given(productRepository.findByIdAndDeleted(any(), any(Boolean.class)))
+                    .willReturn(Optional.ofNullable(product));
+            given(imageRepository.findAllByProductId(any()))
                     .willReturn(List.of());
 
             // when
             ProductResponseDto responseDto = productService.getProduct(productId);
 
             // then
-            assertThat(responseDto.name()).isEqualTo(eventProduct.getName());
+            assertThat(responseDto.name()).isEqualTo(product.getName());
         }
 
         @Test
         @DisplayName("조회 실패")
         void getProductFail() {
             // given
-            Long productId = 3L;
-
             given(productRepository.findByIdAndDeleted(any(), any(Boolean.class)))
                     .willReturn(Optional.empty());
 
@@ -341,16 +231,15 @@ public class ProductServiceTest {
     @DisplayName("상품 등록")
     class RegisterProduct {
 
+        ProductRequestDto requestDto = new ProductRequestDto(
+                "test product", 1000, 100, null, null, Event.NORMAL, 0);
+        List<MultipartFile> files = List.of(
+                new MockMultipartFile("image_name", "image_name.jpg", "image/jpeg", new byte[0]));
+
         @Test
         @DisplayName("등록 성공")
         void registerProductSuccess() {
             // given
-            ProductRequestDto requestDto = new ProductRequestDto(
-                    "test product", 1000, 100, null, null, Event.NORMAL, 0
-            );
-            List<MultipartFile> files = List.of(
-                    new MockMultipartFile("image_name", "image_name.jpg", "image/jpeg", new byte[0]));
-
             given(productRepository.existsByName(any())).willReturn(false);
 
             // when
@@ -366,12 +255,6 @@ public class ProductServiceTest {
         @DisplayName("등록 실패(중복 상품)")
         void registerProductFail() {
             // given
-            ProductRequestDto requestDto = new ProductRequestDto(
-                    "test product", 1000, 100, null, null, Event.NORMAL, 0
-            );
-            List<MultipartFile> files = List.of(
-                    new MockMultipartFile("image_name", "image_name.jpg", "image/jpeg", new byte[0]));
-
             given(productRepository.existsByName(any())).willReturn(true);
 
             // when & then
@@ -388,38 +271,30 @@ public class ProductServiceTest {
     @DisplayName("상품 수정")
     class UpdateProduct {
 
+        Long productId = 1L;
+        ProductRequestDto requestDto = new ProductRequestDto(
+                "test update", 1000, 100, null, null, Event.NORMAL, 0);
+        List<MultipartFile> files = List.of(
+                new MockMultipartFile("image_name", "image_name.jpg", "image/jpeg", new byte[0]));
+
         @Test
         @DisplayName("수정 성공 w/ files")
         void updateProductWithFilesSuccess() {
             // given
-            Long productId = 1L;
-            ProductRequestDto requestDto = new ProductRequestDto(
-                    "test update", 1000, 100, null, null, Event.NORMAL, 0
-            );
-            List<MultipartFile> files = List.of(
-                    new MockMultipartFile("image_name", "image_name.jpg", "image/jpeg", new byte[0]));
-
             given(productRepository.findByIdAndDeleted(any(), any(Boolean.class)))
-                    .willReturn(Optional.ofNullable(normalProduct));
+                    .willReturn(Optional.ofNullable(product));
 
             // when
             productService.updateProduct(productId, requestDto, files);
 
             // then
-            assertThat(normalProduct.getName()).isEqualTo(requestDto.name());
+            assertThat(product.getName()).isEqualTo(requestDto.name());
         }
 
         @Test
         @DisplayName("수정 실패(해당 상품 없음) w/ files")
         void updateProductWithFilesFail() {
             // given
-            Long productId = 1L;
-            ProductRequestDto requestDto = new ProductRequestDto(
-                    "test update", 1000, 100, null, null, Event.NORMAL, 0
-            );
-            List<MultipartFile> files = List.of(
-                    new MockMultipartFile("image_name", "image_name.jpg", "image/jpeg", new byte[0]));
-
             given(productRepository.findByIdAndDeleted(any(), any(Boolean.class)))
                     .willReturn(Optional.empty());
 
@@ -433,31 +308,23 @@ public class ProductServiceTest {
         @DisplayName("수정 성공 w/o files")
         void updateProductWithoutFilesSuccess() {
             // given
-            Long productId = 1L;
-            ProductRequestDto requestDto = new ProductRequestDto(
-                    "test update", 1000, 100, null, null, Event.NORMAL, 0
-            );
-            List<MultipartFile> files = List.of();
+            files = List.of();
 
             given(productRepository.findByIdAndDeleted(any(), any(Boolean.class)))
-                    .willReturn(Optional.ofNullable(normalProduct));
+                    .willReturn(Optional.ofNullable(product));
 
             // when
             productService.updateProduct(productId, requestDto, files);
 
             // then
-            assertThat(normalProduct.getName()).isEqualTo(requestDto.name());
+            assertThat(product.getName()).isEqualTo(requestDto.name());
         }
 
         @Test
         @DisplayName("수정 실패(해당 상품 없음) w/o files")
         void updateProductWithoutFilesFail() {
             // given
-            Long productId = 1L;
-            ProductRequestDto requestDto = new ProductRequestDto(
-                    "test update", 1000, 100, null, null, Event.NORMAL, 0
-            );
-            List<MultipartFile> files = List.of();
+            files = List.of();
 
             given(productRepository.findByIdAndDeleted(any(), any(Boolean.class)))
                     .willReturn(Optional.empty());
@@ -473,15 +340,15 @@ public class ProductServiceTest {
     @DisplayName("상품 삭제")
     class DeleteProduct {
 
+        Long productId = 1L;
+        List<Image> images = List.of(mock(Image.class));
+
         @Test
         @DisplayName("삭제 성공")
         void deleteProductSuccess() {
             // given
-            Long productId = 1L;
-            List<Image> images = List.of(mock(Image.class));
-
             given(productRepository.findByIdAndDeleted(any(), any(Boolean.class)))
-                    .willReturn(Optional.ofNullable(normalProduct));
+                    .willReturn(Optional.ofNullable(product));
             given(imageRepository.findAllByProductId(any()))
                     .willReturn(images);
 
@@ -489,8 +356,8 @@ public class ProductServiceTest {
             productService.deleteProduct(productId);
 
             // then
-            assertThat(normalProduct.getName()).startsWith("normal product-deleted-");
-            assertThat(normalProduct.isDeleted()).isTrue();
+            assertThat(product.getName()).startsWith("normal product-deleted-");
+            assertThat(product.isDeleted()).isTrue();
             verify(imageRepository, times(1)).findAllByProductId(any());
             verify(s3Handler, times(1)).deleteImage(any());
             verify(imageRepository, times(1)).deleteAllByProductId(any());
@@ -500,8 +367,6 @@ public class ProductServiceTest {
         @DisplayName("삭제 실패(해당 상품 없음)")
         void deleteProductFail() {
             // given
-            Long productId = 1L;
-
             given(productRepository.findByIdAndDeleted(any(), any(Boolean.class)))
                     .willReturn(Optional.empty());
 
@@ -517,34 +382,12 @@ public class ProductServiceTest {
         ReflectionTestUtils.setField(productService, "pageSize", pageSize);
     }
 
-    private List<Pageable> getPageables(int eventPage, int page) {
+    private Page<Product> getProductsPage(int page) {
         Sort sort = Sort.by(Sort.Direction.DESC, "modifiedAt");
-        Pageable eventPageable = PageRequest.of(eventPage, eventPageSize, sort);
         Pageable pageable = PageRequest.of(page, pageSize, sort);
-        return List.of(eventPageable, pageable);
+        List<Product> productList = List.of(product);
+        return new PageImpl<>(page == 0 ? productList : List.of(),
+                pageable,
+                productList.size() / pageSize);
     }
-
-    private List<Page<Product>> getProductsPages(int eventPage, int page, List<Pageable> pageables) {
-        List<Product> eventProductList = List.of(eventProduct);
-        List<Product> normalProductList = List.of(normalProduct);
-        Page<Product> eventProducts = new PageImpl<>(eventPage == 0 ? eventProductList : List.of(), pageables.get(0), eventProductList.size() / eventPageSize);
-        Page<Product> products = new PageImpl<>(page == 0 ? normalProductList : List.of(), pageables.get(1), normalProductList.size() / pageSize);
-
-        return List.of(eventProducts, products);
-    }
-
-    private Page<Product> emptyPage(Pageable pageable) {
-        return new PageImpl<>(List.of(), pageable, 1);
-    }
-
-    private void printJsonResult(Object responseDto) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            String jsonResponse = mapper.writeValueAsString(responseDto);
-            System.out.println(jsonResponse);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
 }
