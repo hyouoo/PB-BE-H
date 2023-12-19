@@ -10,6 +10,7 @@ import com.example.purebasketbe.global.s3.S3Handler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,11 +24,14 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ImageRepository imageRepository;
     private final S3Handler s3Handler;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Value("${products.event.page.size}")
     private int eventPageSize;
     @Value("${products.page.size}")
     private int pageSize;
+    final String TOPIC = "event";
+
 
     @Transactional(readOnly = true)
     public ProductListResponseDto getProducts(int eventPage, int page) {
@@ -82,6 +86,10 @@ public class ProductService {
 
         productRepository.save(newProduct);
         saveAndUploadImage(newProduct, files);
+
+        if (newProduct.getEvent().equals(Event.DISCOUNT)) {
+            kafkaTemplate.send(TOPIC, "New Event Raised");
+        }
     }
 
     @Transactional
@@ -91,6 +99,10 @@ public class ProductService {
 
         if (!files.isEmpty()) {
             saveAndUploadImage(product, files);
+        }
+
+        if (product.getEvent().equals(Event.DISCOUNT)) {
+            kafkaTemplate.send(TOPIC, "New Event Raised");
         }
     }
 

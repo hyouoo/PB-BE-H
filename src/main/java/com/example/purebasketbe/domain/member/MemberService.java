@@ -6,9 +6,12 @@ import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -23,6 +26,11 @@ public class MemberService {
         checkIfEmailExist(email);
         Member member = Member.of(requestDto, password);
         memberRepository.save(member);
+    }
+
+    @KafkaListener(topics = "event", groupId = "${spring.kafka.consumer.group-id}")
+    public void printMessage(String msg) {
+        log.info("Message from Kafka : {}", msg);
     }
 
     private void checkIfEmailExist(String email) {
