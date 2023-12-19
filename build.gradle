@@ -27,6 +27,9 @@ dependencies {
     //redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
     // aws
     implementation 'io.awspring.cloud:spring-cloud-aws-starter:3.0.0'
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.0.0'
