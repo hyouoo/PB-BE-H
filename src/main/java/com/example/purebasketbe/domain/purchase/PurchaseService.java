@@ -7,7 +7,6 @@ import com.example.purebasketbe.domain.product.entity.Product;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto.PurchaseDetail;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseResponseDto;
 import com.example.purebasketbe.domain.purchase.entity.Purchase;
-import com.example.purebasketbe.domain.recipe.dto.RecipeResponseDto;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,7 @@ public class PurchaseService {
     private final int PRODUCTS_PER_PAGE = 10;
 
     @Transactional
-    public void purchaseProducts(final List<PurchaseDetail> purchaseRequestDto, Member member) {
+    public void purchaseProducts( List<PurchaseDetail> purchaseRequestDto, Member member) {
         int size = purchaseRequestDto.size();
 
         List<PurchaseDetail> sortedPurchaseDetailList = purchaseRequestDto.stream()

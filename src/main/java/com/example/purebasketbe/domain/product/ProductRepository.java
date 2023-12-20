@@ -22,8 +22,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findAllByDeletedAndEventAndNameContains(boolean isDeleted, Event event, String query, Pageable pageable);
 
-    List<Product> findByIdIn(List<Long> requestIds);
-
     Optional<Product> findByIdAndDeleted(Long productId, boolean isDeleted);
 
     List<Product> findByIdInAndDeleted(List<Long> requestIds, boolean isDeleted);
