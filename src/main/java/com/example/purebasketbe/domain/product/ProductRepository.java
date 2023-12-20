@@ -27,7 +27,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findByIdAndDeleted(Long productId, boolean isDeleted);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select p from Product p where p.id in (:requestIds) and p.deleted=:isDeleted")
+//    @Lock(LockModeType.PESSIMISTIC_WRITE)
+//    @Query("select p from Product p where p.id in (:requestIds) and p.deleted=:isDeleted")
     List<Product> findByIdInAndDeleted(List<Long> requestIds, boolean isDeleted);
 }
