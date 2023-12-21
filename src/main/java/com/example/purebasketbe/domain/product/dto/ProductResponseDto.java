@@ -3,13 +3,9 @@ package com.example.purebasketbe.domain.product.dto;
 import com.example.purebasketbe.domain.product.entity.Event;
 import com.example.purebasketbe.domain.product.entity.Product;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.Objects;
-
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ProductResponseDto(
@@ -39,6 +35,19 @@ public record ProductResponseDto(
                 .event(product.getEvent())
                 .discountRate(product.getDiscountRate())
                 .images(imgUrlList)
+                .build();
+    }
+
+    public static ProductResponseDto from(Product product) {
+        return ProductResponseDto.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .stock(product.getStock())
+                .info(product.getInfo())
+                .category(product.getCategory())
+                .event(product.getEvent())
+                .discountRate(product.getDiscountRate())
                 .build();
     }
 }

@@ -1,16 +1,21 @@
 package com.example.purebasketbe.domain.product;
 
-import com.example.purebasketbe.domain.product.dto.*;
+import com.example.purebasketbe.domain.product.dto.ProductListResponseDto;
+import com.example.purebasketbe.domain.product.dto.ProductRequestDto;
+import com.example.purebasketbe.domain.product.dto.ProductResponseDto;
 import com.example.purebasketbe.domain.product.entity.Event;
 import com.example.purebasketbe.domain.product.entity.Image;
 import com.example.purebasketbe.domain.product.entity.Product;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
+import com.example.purebasketbe.global.kafka.KafkaService;
 import com.example.purebasketbe.global.s3.S3Handler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.*;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +29,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ImageRepository imageRepository;
     private final S3Handler s3Handler;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaService kafkaHandler;
 
     @Value("${products.event.page.size}")
     private int eventPageSize;
@@ -87,9 +92,8 @@ public class ProductService {
         productRepository.save(newProduct);
         saveAndUploadImage(newProduct, files);
 
-        if (newProduct.getEvent().equals(Event.DISCOUNT)) {
-            kafkaTemplate.send(TOPIC, "New Event Raised");
-        }
+        if (newProduct.getEvent().equals(Event.DISCOUNT))
+            kafkaHandler.sendEventToKafka(ProductResponseDto.from(newProduct));
     }
 
     @Transactional
@@ -97,13 +101,10 @@ public class ProductService {
         Product product = findProduct(productId);
         product.update(requestDto);
 
-        if (!files.isEmpty()) {
-            saveAndUploadImage(product, files);
-        }
+        if (!files.isEmpty()) saveAndUploadImage(product, files);
 
-        if (product.getEvent().equals(Event.DISCOUNT)) {
-            kafkaTemplate.send(TOPIC, "New Event Raised");
-        }
+        if (product.getEvent().equals(Event.DISCOUNT))
+            kafkaHandler.sendEventToKafka(ProductResponseDto.from(product));
     }
 
     @Transactional
