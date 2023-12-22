@@ -122,10 +122,7 @@ public class ProductService {
     }
 
     private List<String> getImgUrlList(Product product) {
-        return imageRepository.findAllByProductId(product.getId())
-                .stream()
-                .map(Image::getImgUrl)
-                .toList();
+        return product.getImages().stream().map(Image::getImgUrl).toList();
     }
 
     private void saveAndUploadImage(Product product, List<MultipartFile> files) {
