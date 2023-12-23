@@ -28,7 +28,7 @@ public class SseService {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         sseRepository.save(emitterId, emitter);
 
-        notify(emitter, emitterId, "connected!"); // 503 에러방지 더미 데이터
+        sendHeartbeat(); // 503 에러방지 더미 데이터
 
         emitter.onCompletion(() -> {
             log.info("onCompletion callback");
