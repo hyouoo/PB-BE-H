@@ -27,6 +27,9 @@ dependencies {
     //redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
     // aws
     implementation 'io.awspring.cloud:spring-cloud-aws-starter:3.0.0'
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.0.0'
@@ -42,11 +45,13 @@ dependencies {
     implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
     implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
-
     // prometheus grafana
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-core'
     implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    // email service
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'

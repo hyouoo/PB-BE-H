@@ -8,6 +8,7 @@ import com.example.purebasketbe.domain.product.entity.Image;
 import com.example.purebasketbe.domain.product.entity.Product;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
+import com.example.purebasketbe.global.kafka.KafkaService;
 import com.example.purebasketbe.global.s3.S3Handler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,11 +30,14 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ImageRepository imageRepository;
     private final S3Handler s3Handler;
+    private final KafkaService kafkaHandler;
 
     @Value("${products.event.page.size}")
     private int eventPageSize;
     @Value("${products.page.size}")
     private int pageSize;
+    final String TOPIC = "event";
+
 
     @Transactional(readOnly = true)
     public ProductListResponseDto getProducts(int eventPage, int page) {
@@ -88,6 +92,9 @@ public class ProductService {
 
         productRepository.save(newProduct);
         saveAndUploadImage(newProduct, files);
+
+        if (newProduct.getEvent().equals(Event.DISCOUNT))
+            kafkaHandler.sendEventToKafka(ProductResponseDto.from(newProduct));
     }
 
     @Transactional
@@ -95,9 +102,10 @@ public class ProductService {
         Product product = findProduct(productId);
         product.update(requestDto);
 
-        if (!files.isEmpty()) {
-            saveAndUploadImage(product, files);
-        }
+        if (!files.isEmpty()) saveAndUploadImage(product, files);
+
+        if (product.getEvent().equals(Event.DISCOUNT))
+            kafkaHandler.sendEventToKafka(ProductResponseDto.from(product));
     }
 
     @Transactional
