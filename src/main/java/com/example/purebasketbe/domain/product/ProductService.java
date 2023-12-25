@@ -7,12 +7,12 @@ import com.example.purebasketbe.domain.product.entity.Event;
 import com.example.purebasketbe.domain.product.entity.Image;
 import com.example.purebasketbe.domain.product.entity.Product;
 import com.example.purebasketbe.domain.product.entity.Stock;
+import com.example.purebasketbe.global.RestPageImpl;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
 import com.example.purebasketbe.global.kafka.KafkaService;
 import com.example.purebasketbe.global.s3.S3Handler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -28,7 +28,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Qualifier("redisCacheTemplate")
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -48,13 +47,14 @@ public class ProductService {
         Pageable eventPageable = getPageable(eventPage, eventPageSize);
         Pageable pageable = getPageable(page, pageSize);
 
+
         Page<Product> eventProducts = productRepository.findAllByDeletedAndEvent(false, Event.DISCOUNT, eventPageable);
         Page<Product> products = productRepository.findAllByDeletedAndEvent(false, Event.NORMAL, pageable);
 
-        Page<ProductResponseDto> eventProductsResponse = getResponseDtoFromProducts(eventProducts);
-        Page<ProductResponseDto> productsResponse = getResponseDtoFromProducts(products);
+        RestPageImpl<ProductResponseDto> eventProductsRestPage = RestPageImpl.from(getResponseDtoFromProducts(eventProducts));
+        RestPageImpl<ProductResponseDto> productsRestPage = RestPageImpl.from(getResponseDtoFromProducts(products));
 
-        return ProductListResponseDto.of(eventProductsResponse, productsResponse);
+        return ProductListResponseDto.of(eventProductsRestPage, productsRestPage);
     }
 
     @Transactional(readOnly = true)
