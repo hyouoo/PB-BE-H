@@ -11,7 +11,9 @@ import com.example.purebasketbe.global.exception.ErrorCode;
 import com.example.purebasketbe.global.kafka.KafkaService;
 import com.example.purebasketbe.global.s3.S3Handler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +27,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Qualifier("redisCacheTemplate")
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -39,6 +42,7 @@ public class ProductService {
     final String TOPIC = "event";
 
 
+    @Cacheable(value = "products", key = "#eventPage + '_' + #page")
     @Transactional(readOnly = true)
     public ProductListResponseDto getProducts(int eventPage, int page) {
         Pageable eventPageable = getPageable(eventPage, eventPageSize);
