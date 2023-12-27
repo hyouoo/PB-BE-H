@@ -6,8 +6,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.BatchSize;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -55,11 +54,9 @@ public class Product {
     @Column(nullable = false)
     private boolean deleted;
 
-    @Fetch(FetchMode.SUBSELECT)
+    @BatchSize(size = 21)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
-
-
 
     @Builder
     private Product(String name, Integer price, Integer stock, String info,

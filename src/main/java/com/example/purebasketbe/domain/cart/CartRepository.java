@@ -21,9 +21,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     @Query("DELETE FROM Cart c WHERE c.member=:member AND c.product IN (:products)")
     void deleteByUserAndProductIn(Member member, List<Product> products);
 
-    @Query("SELECT c FROM Cart c " +
-            "JOIN FETCH c.product " +
-            "WHERE c.member = :member")
+    @Query("SELECT c FROM Cart c JOIN FETCH c.product WHERE c.member = :member")
     List<Cart> findAllByMember(Member member);
 
     void deleteAllByMemberAndProductIn(Member member, List<Product> productList);

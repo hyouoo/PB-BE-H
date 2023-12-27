@@ -40,11 +40,8 @@ public class CartService {
     @Transactional(readOnly = true)
     public List<CartResponseDto> getCartList(Member member) {
         return cartRepository.findAllByMember(member).stream()
-                .map(cart -> {
-                    Product product = findAndValidateProduct(cart.getProduct().getId());
-                    Image image = findImage(product.getId());
-                    return CartResponseDto.of(product, image, cart);
-                }).toList();
+                .filter(cart -> !cart.getProduct().isDeleted())
+                .map(CartResponseDto::from).toList();
     }
 
     @Transactional

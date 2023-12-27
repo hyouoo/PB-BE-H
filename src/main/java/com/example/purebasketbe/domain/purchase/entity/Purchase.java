@@ -18,9 +18,6 @@ public class Purchase extends TimeStamp{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
-
     @Min(value = 1)
     @Column(nullable = false)
     private int amount;
@@ -37,8 +34,7 @@ public class Purchase extends TimeStamp{
     private Product product;
 
     @Builder
-    private Purchase(String name, int amount, int price, Member member, Product product) {
-        this.name = name;
+    private Purchase(int amount, int price, Member member, Product product) {
         this.amount = amount;
         this.price = price;
         this.member = member;
@@ -47,7 +43,6 @@ public class Purchase extends TimeStamp{
 
     public static Purchase of(Product product, int amount, Member member) {
         return Purchase.builder()
-                .name(product.getName())
                 .amount(amount)
                 .price(product.getPrice())
                 .member(member)
