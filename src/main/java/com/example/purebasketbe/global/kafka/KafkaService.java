@@ -6,14 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import static com.example.purebasketbe.global.config.KafkaConfig.TOPIC_EVENT;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class KafkaService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
-
-    public static final String TOPIC_EVENT = "sale_event";
 
     // Methods for Producer
     public void sendEventToKafka(ProductResponseDto responseDto) {

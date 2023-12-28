@@ -10,9 +10,11 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaConfig {
 
+    public static final String TOPIC_EVENT = "event";
+
     @Bean
     public NewTopic topic() {
-        return TopicBuilder.name("event")
+        return TopicBuilder.name(TOPIC_EVENT)
                 .partitions(2)
                 .replicas(2)
                 .build();
