@@ -37,31 +37,6 @@ public class SseService {
         return emitter;
     }
 
-    @KafkaListener(topics = TOPIC_EVENT, groupId = "${spring.kafka.consumer.group-id}")
-    private void alarmNewEvent(ProductResponseDto responseDto) {
-        Map<String, SseEmitter> connectionMap = sseRepository.findAllEmitters();
-        int salePrice = responseDto.price() * responseDto.discountRate() / 100;
-        String message = String.format("""
-                        새로운 할인 이벤트!
-                        %s %d%% 할인!! 한정수량 단 %d개!!!""",
-                responseDto.name(), responseDto.discountRate(), responseDto.stock());
-
-        if (!connectionMap.isEmpty()) {
-            connectionMap.forEach((id, emitter) -> notify(emitter, id, message));
-        }
-    }
-
-    private void notify(SseEmitter emitter, String emitterId, Object data) {
-        try {
-            emitter.send(SseEmitter.event()
-                    .id(emitterId)
-                    .data(data)); // String Type만 가능함
-        } catch (IOException e) {
-            log.error("notify 실패 : {}", e.getMessage());
-            sseRepository.delete(emitterId);
-        }
-    }
-
     @Scheduled(fixedRate = 3, timeUnit = TimeUnit.MINUTES) // 3분마다 heartbeat 메세지 전달.
     public void sendHeartbeat() {
         Map<String, SseEmitter> connectionMap = sseRepository.findAllEmitters();
@@ -77,4 +52,31 @@ public class SseService {
             });
         }
     }
+
+//    @KafkaListener(topics = TOPIC_EVENT, groupId = "${spring.kafka.consumer.group-id}")
+//    private void alarmNewEvent(ProductResponseDto responseDto) {
+//        Map<String, SseEmitter> connectionMap = sseRepository.findAllEmitters();
+////        int salePrice = responseDto.price() * responseDto.discountRate() / 100;
+//        String message = String.format("""
+//                        새로운 할인 이벤트!
+//                        %s %d%% 할인!! 한정수량 단 %d개!!!""",
+//                responseDto.name(), responseDto.discountRate(), responseDto.stock());
+//
+//        if (!connectionMap.isEmpty()) {
+//            connectionMap.forEach((id, emitter) -> notify(emitter, id, message));
+//        }
+//    }
+//
+//    private void notify(SseEmitter emitter, String emitterId, Object data) {
+//        try {
+//            emitter.send(SseEmitter.event()
+//                    .id(emitterId)
+//                    .data(data)); // String Type만 가능함
+//        } catch (IOException e) {
+//            log.error("notify 실패 : {}", e.getMessage());
+//            sseRepository.delete(emitterId);
+//        }
+//    }
+
+
 }

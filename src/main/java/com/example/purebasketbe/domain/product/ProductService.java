@@ -36,8 +36,6 @@ public class ProductService {
     private int eventPageSize;
     @Value("${products.page.size}")
     private int pageSize;
-    final String TOPIC = "event";
-
 
     @Transactional(readOnly = true)
     public ProductListResponseDto getProducts(int eventPage, int page) {
@@ -93,8 +91,9 @@ public class ProductService {
         productRepository.save(newProduct);
         saveAndUploadImage(newProduct, files);
 
-        if (newProduct.getEvent().equals(Event.DISCOUNT))
+        if (newProduct.getEvent().equals(Event.DISCOUNT)) {
             kafkaHandler.sendEventToKafka(ProductResponseDto.from(newProduct));
+        }
     }
 
     @Transactional
@@ -104,8 +103,9 @@ public class ProductService {
 
         if (!files.isEmpty()) saveAndUploadImage(product, files);
 
-        if (product.getEvent().equals(Event.DISCOUNT))
+        if (product.getEvent().equals(Event.DISCOUNT)) {
             kafkaHandler.sendEventToKafka(ProductResponseDto.from(product));
+        }
     }
 
     @Transactional
