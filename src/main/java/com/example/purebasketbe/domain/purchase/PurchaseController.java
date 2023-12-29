@@ -1,7 +1,6 @@
 package com.example.purebasketbe.domain.purchase;
 
 import com.example.purebasketbe.domain.member.entity.Member;
-import com.example.purebasketbe.domain.product.PurchaseFacade;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseResponseDto;
 import com.example.purebasketbe.global.tool.LoginAccount;

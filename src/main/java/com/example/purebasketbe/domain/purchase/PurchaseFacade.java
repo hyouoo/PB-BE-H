@@ -1,4 +1,4 @@
-package com.example.purebasketbe.domain.product;
+package com.example.purebasketbe.domain.purchase;
 
 import com.example.purebasketbe.domain.member.entity.Member;
 import com.example.purebasketbe.domain.purchase.PurchaseService;
