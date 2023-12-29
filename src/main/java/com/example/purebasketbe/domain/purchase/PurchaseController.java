@@ -1,6 +1,7 @@
 package com.example.purebasketbe.domain.purchase;
 
 import com.example.purebasketbe.domain.member.entity.Member;
+import com.example.purebasketbe.domain.product.PurchaseFacade;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseResponseDto;
 import com.example.purebasketbe.global.tool.LoginAccount;
@@ -17,11 +18,12 @@ import org.springframework.web.bind.annotation.*;
 public class PurchaseController {
 
     private final PurchaseService purchaseService;
+    private final PurchaseFacade purchaseFacade;
 
     @PostMapping
     public ResponseEntity<Void> purchaseProducts(@RequestBody @Validated PurchaseRequestDto requestDto,
                                                  @LoginAccount Member member) {
-        purchaseService.purchaseProducts(requestDto.purchaseList(), member);
+        purchaseFacade.purchaseProducts(requestDto.purchaseList(), member);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
