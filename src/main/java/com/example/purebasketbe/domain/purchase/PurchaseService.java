@@ -15,9 +15,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 @Slf4j
@@ -27,6 +31,7 @@ public class PurchaseService {
 
     private final PurchaseRepository purchaseRepository;
     private final ProductRepository productRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     private final int PRODUCTS_PER_PAGE = 10;
 
@@ -40,9 +45,27 @@ public class PurchaseService {
             Product product = validProductList.get(i);
             int amount = amountList.get(i);
             checkProductStock(product, amount);
-            product.decrementStock(amount);
-            product.incrementSalesCount(amount);
         }
+        productBatchUpdate(validProductList, amountList);
+    }
+
+    public void productBatchUpdate(List<Product> productList, List<Integer> amountList) {
+        String sql = "UPDATE product SET stock = stock - ?, sales_count = sales_count + ? WHERE id = ?";
+
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setLong(1, amountList.get(i));
+                ps.setLong(2, amountList.get(i));
+                ps.setLong(3, productList.get(i).getId());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return productList.size();
+            }
+        });
+
     }
 
 
