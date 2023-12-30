@@ -12,7 +12,6 @@ public record ProductResponseDto(
         Long id,
         String name,
         int price,
-        int stock,
         String info,
         String category,
         Event event,

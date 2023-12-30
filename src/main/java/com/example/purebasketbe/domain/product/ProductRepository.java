@@ -25,7 +25,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findByIdAndDeleted(Long productId, boolean isDeleted);
 
-//    @Query("SELECT p FROM Product p WHERE p.id IN :requestedProductsIds AND p.deleted = :isDeleted")
     List<Product> findByIdInAndDeleted(List<Long> requestedProductsIds, boolean isDeleted);
 
 }

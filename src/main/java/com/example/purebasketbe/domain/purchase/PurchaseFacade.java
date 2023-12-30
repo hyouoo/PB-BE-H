@@ -19,11 +19,10 @@ public class PurchaseFacade {
     private final KafkaService kafkaService;
 
     public void purchaseProducts(List<PurchaseDetail> purchaseRequestDto, Member member) {
-        int size = purchaseRequestDto.size();
 
         List<Long> requestedProductsIds = purchaseRequestDto.stream()
                 .map(PurchaseDetail::productId).toList();
-        purchaseService.processPurchase(purchaseRequestDto, requestedProductsIds, size);
+        purchaseService.processPurchase(purchaseRequestDto, requestedProductsIds);
 
         log.info("회원 {}: 상품 구매 요청 적재", member.getId());
         kafkaService.sendPurchaseToKafka(purchaseRequestDto, member);

@@ -2,6 +2,7 @@ package com.example.purebasketbe.domain.purchase;
 
 import com.example.purebasketbe.domain.member.entity.Member;
 import com.example.purebasketbe.domain.product.ProductRepository;
+import com.example.purebasketbe.domain.product.StockRepository;
 import com.example.purebasketbe.domain.product.entity.Product;
 import com.example.purebasketbe.domain.product.entity.Stock;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto.PurchaseDetail;
@@ -28,15 +29,17 @@ public class PurchaseService {
 
     private final PurchaseRepository purchaseRepository;
     private final ProductRepository productRepository;
+    private final StockRepository stockRepository;
 
     private final int PRODUCTS_PER_PAGE = 10;
 
     @Transactional
-    public void processPurchase(List<PurchaseDetail> purchaseRequestDto, List<Long> requestedProductsIds, int size) {
+    public void processPurchase(List<PurchaseDetail> purchaseRequestDto, List<Long> requestedProductsIds) {
+        int size = purchaseRequestDto.size();
         List<Product> validProductList = productRepository.findByIdInAndDeleted(requestedProductsIds, false);
         validateProducts(size, validProductList);
 
-        List<Stock> stockList = validProductList.stream().map(Product::getStock).toList();
+        List<Stock> stockList = stockRepository.findAllByProductIn(validProductList);
         List<Integer> amountList = purchaseRequestDto.stream().map(PurchaseDetail::amount).toList();
 
         for (int i = 0; i < size; i++) {
