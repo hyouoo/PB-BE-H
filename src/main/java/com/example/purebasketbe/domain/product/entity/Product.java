@@ -31,9 +31,6 @@ public class Product {
     @Column(nullable = false)
     private int price;
 
-    @Column(nullable = false)
-    private int stock;
-
     private String info;
 
     private String category;
@@ -42,8 +39,6 @@ public class Product {
     private Event event;
 
     private int discountRate;
-
-    private int salesCount;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -54,31 +49,32 @@ public class Product {
     @Column(nullable = false)
     private boolean deleted;
 
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Stock stock;
+
     @BatchSize(size = 21)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
 
     @Builder
-    private Product(String name, Integer price, Integer stock, String info,
-                    String category, Event event, Integer discountRate) {
+    private Product(String name, Integer price,  String info,
+                    String category, Event event, Integer discountRate, Stock stock) {
         this.name = name;
         this.price = price;
-        this.stock = stock;
         this.info = info;
         this.category = category;
         this.event = event;
         this.discountRate = discountRate;
-        this.salesCount = 0;
         this.createdAt = LocalDateTime.now();
         this.modifiedAt = LocalDateTime.now();
         this.deleted = false;
+        this.stock = stock;
     }
 
     public static Product from(ProductRequestDto requestDto) {
         return Product.builder()
                 .name(requestDto.name())
                 .price(requestDto.price())
-                .stock(requestDto.stock())
                 .info(requestDto.info())
                 .category(requestDto.category())
                 .event(requestDto.event())
@@ -89,7 +85,6 @@ public class Product {
     public void update(ProductRequestDto requestDto) {
         this.name = requestDto.name() == null ? this.name : requestDto.name();
         this.price = requestDto.price() == null ? this.price : requestDto.price();
-        this.stock = requestDto.stock() == null ? this.stock : this.stock + requestDto.stock();
         this.info = requestDto.info() == null ? this.info : requestDto.info();
         this.category = requestDto.category() == null ? this.category : requestDto.category();
         this.event = requestDto.event() == null ? this.event : requestDto.event();
@@ -103,11 +98,4 @@ public class Product {
         this.deleted = true;
     }
 
-    public void incrementSalesCount(int amount) {
-        this.salesCount += amount;
-    }
-
-    public void decrementStock(int amount) {
-        this.stock -= amount;
-    }
 }

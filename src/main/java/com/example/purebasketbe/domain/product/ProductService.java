@@ -6,6 +6,7 @@ import com.example.purebasketbe.domain.product.dto.ProductResponseDto;
 import com.example.purebasketbe.domain.product.entity.Event;
 import com.example.purebasketbe.domain.product.entity.Image;
 import com.example.purebasketbe.domain.product.entity.Product;
+import com.example.purebasketbe.domain.product.entity.Stock;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
 import com.example.purebasketbe.global.kafka.KafkaService;
@@ -29,6 +30,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ImageRepository imageRepository;
+    private final StockRepository stockRepository;
     private final S3Handler s3Handler;
     private final KafkaService kafkaHandler;
 
@@ -87,8 +89,10 @@ public class ProductService {
     public void registerProduct(ProductRequestDto requestDto, List<MultipartFile> files) {
         checkExistProductByName(requestDto.name());
         Product newProduct = Product.from(requestDto);
+        Stock stock = Stock.of(requestDto, newProduct);
 
         productRepository.save(newProduct);
+        stockRepository.save(stock);
         saveAndUploadImage(newProduct, files);
 
         if (newProduct.getEvent().equals(Event.DISCOUNT)) {
@@ -99,9 +103,16 @@ public class ProductService {
     @Transactional
     public void updateProduct(Long productId, ProductRequestDto requestDto, List<MultipartFile> files) {
         Product product = findProduct(productId);
+        Stock stock = product.getStock();
         product.update(requestDto);
 
-        if (!files.isEmpty()) saveAndUploadImage(product, files);
+        if (requestDto.stock() != null) {
+            stock.update(requestDto.stock());
+        }
+
+        if (!files.isEmpty()) {
+            saveAndUploadImage(product, files);
+        }
 
         if (product.getEvent().equals(Event.DISCOUNT)) {
             kafkaHandler.sendEventToKafka(ProductResponseDto.from(product));

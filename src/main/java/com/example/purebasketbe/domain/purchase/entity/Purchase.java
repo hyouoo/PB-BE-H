@@ -18,35 +18,24 @@ public class Purchase extends TimeStamp{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Min(value = 1)
-    @Column(nullable = false)
-    private int amount;
-
-    @Column(nullable = false)
-    private int price;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @Column(nullable = false)
+    private int totalPrice;
 
     @Builder
-    private Purchase(int amount, int price, Member member, Product product) {
-        this.amount = amount;
-        this.price = price;
+    private Purchase(Member member, int totalPrice) {
+
         this.member = member;
-        this.product = product;
+        this.totalPrice = totalPrice;
     }
 
-    public static Purchase of(Product product, int amount, Member member) {
+    public static Purchase of(Member member, int totalPrice) {
         return Purchase.builder()
-                .amount(amount)
-                .price(product.getPrice())
                 .member(member)
-                .product(product)
+                .totalPrice(totalPrice)
                 .build();
     }
 }
