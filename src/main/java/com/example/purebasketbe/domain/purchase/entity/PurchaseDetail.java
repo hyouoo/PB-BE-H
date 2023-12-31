@@ -20,6 +20,10 @@ public class PurchaseDetail {
     @JoinColumn(name = "product_id")
     private Product product;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "purchase_id")
+    private Purchase purchase;
+
     @Min(value = 1)
     @Column(nullable = false)
     private int amount;
