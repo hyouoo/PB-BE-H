@@ -90,6 +90,7 @@ public class ProductService {
         checkExistProductByName(requestDto.name());
         Product newProduct = Product.from(requestDto);
         Stock stock = Stock.of(requestDto, newProduct);
+        newProduct.attachStock(stock);
 
         productRepository.save(newProduct);
         stockRepository.save(stock);

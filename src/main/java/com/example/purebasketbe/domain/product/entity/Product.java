@@ -97,4 +97,8 @@ public class Product {
         this.modifiedAt = LocalDateTime.now();
         this.deleted = true;
     }
+
+    public void attachStock(Stock stock) {
+        this.stock = stock;
+    }
 }
