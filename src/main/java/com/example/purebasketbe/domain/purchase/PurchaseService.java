@@ -1,7 +1,6 @@
 package com.example.purebasketbe.domain.purchase;
 
 import com.example.purebasketbe.domain.member.entity.Member;
-import com.example.purebasketbe.domain.product.ProductRepository;
 import com.example.purebasketbe.domain.product.StockRepository;
 import com.example.purebasketbe.domain.product.entity.Product;
 import com.example.purebasketbe.domain.product.entity.Stock;
@@ -10,6 +9,7 @@ import com.example.purebasketbe.domain.purchase.dto.PurchaseResponseDto;
 import com.example.purebasketbe.domain.purchase.entity.Purchase;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
+import com.example.purebasketbe.global.kafka.KafkaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,46 +28,34 @@ import java.util.List;
 public class PurchaseService {
 
     private final PurchaseRepository purchaseRepository;
-    private final ProductRepository productRepository;
     private final StockRepository stockRepository;
+    private final KafkaService kafkaService;
 
     private final int PRODUCTS_PER_PAGE = 10;
 
     @Transactional
-    public void processPurchase(List<PurchaseDetail> purchaseRequestDto, List<Long> requestedProductsIds) {
+    public void purchaseProducts(List<PurchaseDetail> purchaseRequestDto, Member member) {
         int size = purchaseRequestDto.size();
-        List<Product> validProductList = productRepository.findByIdInAndDeleted(requestedProductsIds, false);
+        // Lock 적용
+        List<Long> requestedProductsIds = purchaseRequestDto.stream()
+                .map(PurchaseDetail::productId).toList();
+        List<Stock> stockList = stockRepository.findAllByProductIdIn(requestedProductsIds);
+
+        List<Product> validProductList = stockList.stream().map(Stock::getProduct).toList();
         validateProducts(size, validProductList);
 
-        List<Stock> stockList = stockRepository.findAllByProductIn(validProductList);
         List<Integer> amountList = purchaseRequestDto.stream().map(PurchaseDetail::amount).toList();
-
         for (int i = 0; i < size; i++) {
             Stock stock = stockList.get(i);
             int amount = amountList.get(i);
             checkProductStock(stock, amount);
             stock.decrementStock(amount);
         }
-//        productBatchUpdate(updatedProductList, amountList);
+
+        kafkaService.sendPurchaseToKafka(purchaseRequestDto, member);
+        log.info("회원 {}: 상품 구매 요청 적재", member.getId());
     }
 
-//    public void productBatchUpdate(List<Product> productList, List<Integer> amountList) {
-//        String sql = "UPDATE product SET stock = stock - ?, sales_count = sales_count + ? WHERE id = ?";
-//
-//        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-//            @Override
-//            public void setValues(PreparedStatement ps, int i) throws SQLException {
-//                ps.setLong(1, amountList.get(i));
-//                ps.setLong(2, amountList.get(i));
-//                ps.setLong(3, productList.get(i).getId());
-//            }
-//            @Override
-//            public int getBatchSize() {
-//                return productList.size();
-//            }
-//        });
-//
-//    }
 
     @Transactional(readOnly = true)
     public Page<PurchaseResponseDto> getPurchases(Member member, int page, String sortBy, String order) {
@@ -92,9 +80,4 @@ public class PurchaseService {
         }
     }
 
-    private Product getProductById(Long id) {
-        return productRepository.findById(id).orElseThrow(
-                () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
-        );
-    }
 }

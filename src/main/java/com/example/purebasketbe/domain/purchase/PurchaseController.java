@@ -17,12 +17,11 @@ import org.springframework.web.bind.annotation.*;
 public class PurchaseController {
 
     private final PurchaseService purchaseService;
-    private final PurchaseFacade purchaseFacade;
 
     @PostMapping
     public ResponseEntity<Void> purchaseProducts(@RequestBody @Validated PurchaseRequestDto requestDto,
                                                  @LoginAccount Member member) {
-        purchaseFacade.purchaseProducts(requestDto.purchaseList(), member);
+        purchaseService.purchaseProducts(requestDto.purchaseList(), member);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
