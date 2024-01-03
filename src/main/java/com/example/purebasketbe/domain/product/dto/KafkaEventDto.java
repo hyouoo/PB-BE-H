@@ -19,7 +19,6 @@ public record KafkaEventDto(
         return KafkaEventDto.builder()
                 .name(product.getName())
                 .price(product.getPrice())
-                .stock(product.getStock())
                 .discountRate(product.getDiscountRate())
                 .build();
     }

@@ -28,7 +28,7 @@ public class KafkaConfig {
     @Bean
     public NewTopic saleEventTopic() {
         return TopicBuilder.name("event")
-                .partitions(2)
+                .partitions(3)
                 .replicas(2)
                 .build();
     }
@@ -36,7 +36,7 @@ public class KafkaConfig {
     @Bean
     public NewTopic purchaseTopic() {
         return TopicBuilder.name("purchase")
-                .partitions(2)
+                .partitions(3)
 //                .replicas(1)
                 .build();
     }
