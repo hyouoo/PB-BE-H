@@ -36,11 +36,4 @@ public class Purchase extends TimeStamp{
         this.member = member;
         this.totalPrice = totalPrice;
     }
-//
-//    public static Purchase of(Member member, int totalPrice) {
-//        return Purchase.builder()
-//                .member(member)
-//                .totalPrice(totalPrice)
-//                .build();
-//    }
 }
