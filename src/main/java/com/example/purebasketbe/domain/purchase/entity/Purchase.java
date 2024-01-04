@@ -1,13 +1,14 @@
 package com.example.purebasketbe.domain.purchase.entity;
 
 import com.example.purebasketbe.domain.member.entity.Member;
-import com.example.purebasketbe.domain.product.entity.Product;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,6 +23,10 @@ public class Purchase extends TimeStamp{
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @OneToMany(mappedBy="purchase", fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<PurchaseDetail> purchaseDetails = new ArrayList<>();
+
     @Column(nullable = false)
     private int totalPrice;
 
@@ -31,11 +36,11 @@ public class Purchase extends TimeStamp{
         this.member = member;
         this.totalPrice = totalPrice;
     }
-
-    public static Purchase of(Member member, int totalPrice) {
-        return Purchase.builder()
-                .member(member)
-                .totalPrice(totalPrice)
-                .build();
-    }
+//
+//    public static Purchase of(Member member, int totalPrice) {
+//        return Purchase.builder()
+//                .member(member)
+//                .totalPrice(totalPrice)
+//                .build();
+//    }
 }

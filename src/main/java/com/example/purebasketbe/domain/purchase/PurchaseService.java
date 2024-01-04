@@ -1,7 +1,6 @@
 package com.example.purebasketbe.domain.purchase;
 
 import com.example.purebasketbe.domain.member.entity.Member;
-import com.example.purebasketbe.domain.product.ProductRepository;
 import com.example.purebasketbe.domain.product.StockRepository;
 import com.example.purebasketbe.domain.product.entity.Product;
 import com.example.purebasketbe.domain.product.entity.Stock;

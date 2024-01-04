@@ -12,7 +12,9 @@ import java.util.List;
 
 @Repository
 public interface StockRepository extends JpaRepository<Stock, Long> {
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT s FROM Stock s WHERE s.product.id IN :requestedProductsIds")
     List<Stock> findAllByProductIdIn(List<Long> requestedProductsIds);
+
 }

@@ -17,14 +17,12 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     @Query("select exists (select c.id from Cart c where c.product = :product)")
     boolean existsProduct(Product product);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("DELETE FROM Cart c WHERE c.member=:member AND c.product IN (:products)")
-    void deleteByMemberAndProductIn(Member member, List<Product> products);
+    void deleteAllByMemberAndProductIn(Member member, List<Product> products);
 
     @Query("SELECT c FROM Cart c JOIN FETCH c.product WHERE c.member = :member")
     List<Cart> findAllByMember(Member member);
-
-    void deleteAllByMemberAndProductIn(Member member, List<Product> productList);
 
     Optional<Cart> findByProductIdAndMember(Long productId, Member member);
 

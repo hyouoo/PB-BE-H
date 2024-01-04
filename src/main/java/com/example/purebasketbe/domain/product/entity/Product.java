@@ -49,11 +49,11 @@ public class Product {
     @Column(nullable = false)
     private boolean deleted;
 
-    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private Stock stock;
 
     @BatchSize(size = 21)
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
 
     @Builder
@@ -98,4 +98,7 @@ public class Product {
         this.deleted = true;
     }
 
+    public void attachStock(Stock stock) {
+        this.stock = stock;
+    }
 }
