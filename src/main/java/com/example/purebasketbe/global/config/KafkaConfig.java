@@ -36,8 +36,8 @@ public class KafkaConfig {
     @Bean
     public NewTopic purchaseTopic() {
         return TopicBuilder.name("purchase")
-                .partitions(2)
-//                .replicas(1)
+                .partitions(3)
+                .replicas(2)
                 .build();
     }
 
