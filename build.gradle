@@ -50,6 +50,11 @@ dependencies {
     implementation 'io.micrometer:micrometer-core'
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
+    // elk es 8.11.1
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+    implementation 'com.github.danielwegener:logback-kafka-appender:0.2.0-RC2'
+
     // email service
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 

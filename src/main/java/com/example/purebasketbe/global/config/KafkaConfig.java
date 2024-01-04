@@ -26,9 +26,9 @@ public class KafkaConfig {
     private String bootStrapServers;
 
     @Bean
-    public NewTopic saleEventTopic() {
+    public NewTopic eventTopic() {
         return TopicBuilder.name("event")
-                .partitions(2)
+                .partitions(3)
                 .replicas(2)
                 .build();
     }
@@ -38,6 +38,14 @@ public class KafkaConfig {
         return TopicBuilder.name("purchase")
                 .partitions(2)
 //                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic logsTopic() {
+        return TopicBuilder.name("logs")
+                .partitions(3)
+                .replicas(2)
                 .build();
     }
 

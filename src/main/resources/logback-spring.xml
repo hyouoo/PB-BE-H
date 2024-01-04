@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+    <springProfile name="dev">
+        <property name="dest-logstash" value="15.164.171.175:50000"/>
+        <property name="dest-kafka" value="3.34.153.100:19092,3.34.153.100:29092,3.34.153.100:39092"/>
+    </springProfile>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>"%d{yyyy-MM-dd HH:mm:ss.SSS} %magenta([%thread]) %highlight([%-3level]) %logger{5} - %msg %n"</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashAccessTcpSocketAppender">
+        <destination>${dest-logstash}</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+        </encoder>
+    </appender>
+
+    <appender name="KAFKA" class="com.github.danielwegener.logback.kafka.KafkaAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %magenta([%thread]) %highlight([%-3level]) %logger{36} - %msg %n</pattern>
+        </encoder>
+
+        <topic>logs</topic>
+        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy" />
+        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy" />
+
+        <producerConfig>bootstrap.servers=${dest-kafka}</producerConfig>
+        <producerConfig>acks=0</producerConfig>
+        <producerConfig>linger.ms=100</producerConfig>
+        <producerConfig>max.block.ms=100</producerConfig>
+    </appender>
+
+    <springProfile name="dev">
+        <root level="INFO">
+            <appender-ref ref="LOGSTASH"/>
+            <appender-ref ref="KAFKA"/>
+            <appender-ref ref="CONSOLE" />
+        </root>
+    </springProfile>
+</configuration>
