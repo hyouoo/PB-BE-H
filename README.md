@@ -3,13 +3,13 @@
 ## 🧺 01. 프로젝트 <Pure Basket>소개
 
 <aside>
-💡왜 유기농 식품몰인가?
+<strong>💡왜 유기농 식품몰인가?</strong><br><br>
 
 엔데믹 시대의 건강 트렌드에 발 맞춰 **헬시 플레저(Healthy Pleasure)문화**가 다가옴에 따라 단순히 식품을 판매하는 것이 아닌, 건강한 삶의 방식을 제안하고 고객이 자신의 **건강을 스스로 '관리'할 수 있는 환경**을 **조성**하는 것입니다. 
 
 </aside>
 
-헬시 플레저(Healthy Pleasure)는 **Healthy(건강한)와 Pleasure(기쁨)가 결합한 단어**로, **건강 관리의 즐거움**을 의미합니다.![image](https://github.com/Pure-Basket/Pure-Basket-BE/assets/35479166/b270b460-a34b-44ee-97d8-7c6cd82d39ca)
+![image](https://github.com/Pure-Basket/Pure-Basket-BE/assets/35479166/b270b460-a34b-44ee-97d8-7c6cd82d39ca)
 
 
 헬시 플레저(Healthy Pleasure)는 **Healthy(건강한)와 Pleasure(기쁨)가 결합한 단어**로, **건강 관리의 즐거움**을 의미합니다.
@@ -32,7 +32,7 @@
 ## 🎯 02. 프로젝트 목표
 
 <aside>
-💡 E-commerce 플랫폼의 주요 트래픽 발생 이벤트인 할인 이벤트를 가정하여 사용자들의 주문이 급격히 증가하였을 때 주문 오류 없는 안정적인 서비스가 가능한 서버를 구축하고자 하였습니다.
+💡 E-commerce 플랫폼의 주요 트래픽 발생 이벤트인 할인 이벤트를 가정하여 <strong>사용자들의 주문이 급격히 증가하였을 때 주문 오류 없는 안정적인 서비스가 가능한 서버</strong>를 구축하고자 하였습니다.<br><br>
 
 </aside>
 
@@ -636,45 +636,20 @@ public ConsumerFactory<String, KafkaPurchaseDto> consumerFactory() {
 
 ### 🖥️ Backend
 
-**Tech Stack**
-
-- Spring Boot
-- Spring JPA
-- Spring Security
-- Kafka
-- Elastic Search
-
-**TEST**
-
-- Junit5
-- Jmeter
-
-**CI/CD**
-
-- Github Action
+| Category      | Technologies                          |
+|---------------|---------------------------------------|
+| Tech Stack    | Spring Boot, Spring JPA, Spring Security, Kafka, Elastic Search |
+| TEST          | Junit5, Jmeter                        |
+| CI/CD         | Github Action                         |
+| DB            | AWS RDS (MySQL), Redis                |
+| DevOps        | Docker, AWS EC2, AWS S3               |
+| Logging & Monitoring | Logstash/Kibana, Prometheus/Grafana, Pinpoint |
 
 ### 📺 Frontend
 
-**Tech Stack**
-
-- React
-
-**DB**
-
-- AWS RDS (MySQL)
-- Redis
-
-**DevOps**
-
-- Docker
-- AWS EC2
-- AWS S3
-
-**Logging & Monitoring**
-
-- Logstash/Kibana
-- Prometheus/Grafana
-- Pinpoint
+| Category      | Technologies                          |
+|---------------|---------------------------------------|
+| Tech Stack    | React |
 
 <br>
 <br>
