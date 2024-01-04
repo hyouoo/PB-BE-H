@@ -32,7 +32,7 @@ public class CartService {
     @Transactional
     public void addToCart(Long productId, CartRequestDto requestDto, Member member) {
         Product product = findAndValidateProduct(productId);
-        checkIfExist(product);
+        checkIfExist(product, member);
         Cart newCart = Cart.of(product, member, requestDto);
         cartRepository.save(newCart);
     }
@@ -73,8 +73,8 @@ public class CartService {
         );
     }
 
-    private void checkIfExist(Product product) {
-        if (cartRepository.existsProduct(product)) {
+    private void checkIfExist(Product product, Member member) {
+        if (cartRepository.existsProductByMember(product, member)) {
             throw new CustomException(ErrorCode.PRODUCT_ALREADY_ADDED);
         }
     }
