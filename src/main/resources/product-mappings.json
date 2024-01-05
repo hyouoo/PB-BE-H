@@ -1,0 +1,23 @@
+{
+  "properties": {
+    "id": {
+      "type": "long"
+    },
+    "name": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+    "info": {
+      "type": "keyword",
+      "analyzer": "korean"
+    },
+    "category": {
+      "type": "keyword",
+      "analyzer": "korean"
+    },
+    "event": {
+      "type": "match_only_text",
+      "analyzer": "korean"
+    }
+  }
+}
