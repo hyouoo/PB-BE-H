@@ -1,6 +1,7 @@
 package com.example.purebasketbe.domain.purchase;
 
 import com.example.purebasketbe.domain.member.entity.Member;
+import com.example.purebasketbe.domain.product.ProductRepository;
 import com.example.purebasketbe.domain.product.StockRepository;
 import com.example.purebasketbe.domain.product.entity.Product;
 import com.example.purebasketbe.domain.product.entity.Stock;
@@ -29,6 +30,7 @@ public class PurchaseService {
 
     private final PurchaseRepository purchaseRepository;
     private final StockRepository stockRepository;
+    private final ProductRepository productRepository;
     private final KafkaService kafkaService;
 
     private final int PRODUCTS_PER_PAGE = 10;
@@ -39,18 +41,18 @@ public class PurchaseService {
         // Lock 적용
         List<Long> requestedProductsIds = purchaseRequestDto.stream()
                 .map(PurchaseDetail::productId).toList();
-        List<Stock> stockList = stockRepository.findAllByProductIdIn(requestedProductsIds);
+//        List<Stock> stockList = stockRepository.findAllByProductIdIn(requestedProductsIds);
 
-        List<Product> validProductList = stockList.stream().map(Stock::getProduct).toList();
+        List<Product> validProductList = productRepository.findByIdInAndDeleted(requestedProductsIds, false);
         validateProducts(size, validProductList);
 
-        List<Integer> amountList = purchaseRequestDto.stream().map(PurchaseDetail::amount).toList();
-        for (int i = 0; i < size; i++) {
-            Stock stock = stockList.get(i);
-            int amount = amountList.get(i);
-            checkProductStock(stock, amount);
-            stock.decrementStock(amount);
-        }
+//        List<Integer> amountList = purchaseRequestDto.stream().map(PurchaseDetail::amount).toList();
+//        for (int i = 0; i < size; i++) {
+//            Stock stock = stockList.get(i);
+//            int amount = amountList.get(i);
+//            checkProductStock(stock, amount);
+//            stock.decrementStock(amount);
+//        }
 
         kafkaService.sendPurchaseToKafka(purchaseRequestDto, member);
         log.info("회원 {}: 상품 구매 요청 적재", member.getId());
@@ -73,9 +75,9 @@ public class PurchaseService {
         }
     }
 
-    private static void checkProductStock(Stock stock, int amount) {
-        if (stock.getStock() < amount) {
-            throw new CustomException(ErrorCode.NOT_ENOUGH_PRODUCT);
-        }
-    }
+//    private static void checkProductStock(Stock stock, int amount) {
+//        if (stock.getStock() < amount) {
+//            throw new CustomException(ErrorCode.NOT_ENOUGH_PRODUCT);
+//        }
+//    }
 }

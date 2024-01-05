@@ -40,8 +40,5 @@ public class Stock {
         this.stock = stock;
     }
 
-    public void decrementStock(int amount) {
-        this.stock -= amount;
-    }
 
 }

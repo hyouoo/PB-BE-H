@@ -1,6 +1,5 @@
 package com.example.purebasketbe.domain.product;
 
-import com.example.purebasketbe.domain.product.entity.Product;
 import com.example.purebasketbe.domain.product.entity.Stock;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,9 +11,5 @@ import java.util.List;
 
 @Repository
 public interface StockRepository extends JpaRepository<Stock, Long> {
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT s FROM Stock s WHERE s.product.id IN :requestedProductsIds")
-    List<Stock> findAllByProductIdIn(List<Long> requestedProductsIds);
 
 }
