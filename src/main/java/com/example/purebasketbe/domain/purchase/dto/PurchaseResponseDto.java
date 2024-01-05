@@ -17,6 +17,7 @@ public record PurchaseResponseDto(
 
     public static PurchaseResponseDto from(Purchase purchase) {
         return PurchaseResponseDto.builder()
+                .id(purchase.getId())
                 .totalPrice(purchase.getTotalPrice())
                 .purchasedAt(purchase.getPurchasedAt())
                 .build();
