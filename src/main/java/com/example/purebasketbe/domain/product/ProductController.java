@@ -32,6 +32,16 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
+    @GetMapping("/search/es")
+    public ResponseEntity<ProductListResponseDto> searchProductsByES(
+            @RequestParam(defaultValue = "", required = false) String query,
+            @RequestParam(defaultValue = "", required = false) String category,
+            @RequestParam(defaultValue = "1", required = false) int eventPage,
+            @RequestParam(defaultValue = "1", required = false) int page) {
+        ProductListResponseDto responseBody = productService.searchProductsByES(query, category, eventPage - 1, page - 1);
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
+    }
+
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponseDto> getProduct(@PathVariable Long productId) {
         ProductResponseDto responseBody = productService.getProduct(productId);

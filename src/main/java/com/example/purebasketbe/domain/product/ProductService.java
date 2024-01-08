@@ -3,10 +3,7 @@ package com.example.purebasketbe.domain.product;
 import com.example.purebasketbe.domain.product.dto.ProductListResponseDto;
 import com.example.purebasketbe.domain.product.dto.ProductRequestDto;
 import com.example.purebasketbe.domain.product.dto.ProductResponseDto;
-import com.example.purebasketbe.domain.product.entity.Event;
-import com.example.purebasketbe.domain.product.entity.Image;
-import com.example.purebasketbe.domain.product.entity.Product;
-import com.example.purebasketbe.domain.product.entity.Stock;
+import com.example.purebasketbe.domain.product.entity.*;
 import com.example.purebasketbe.global.RestPageImpl;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
@@ -19,6 +16,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHitSupport;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.SearchPage;
+import org.springframework.data.elasticsearch.core.query.Criteria;
+import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
+import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +39,7 @@ public class ProductService {
     private final StockRepository stockRepository;
     private final S3Handler s3Handler;
     private final KafkaService kafkaHandler;
+    private final ElasticsearchOperations elasticsearchOperations;
 
     @Value("${products.event.page.size}")
     private int eventPageSize;
@@ -81,6 +86,32 @@ public class ProductService {
         return ProductListResponseDto.of(eventProductsResponse, productsResponse);
     }
 
+    @Transactional(readOnly = true)
+    public ProductListResponseDto searchProductsByES(String query, String category, int eventPage, int page) {
+        Pageable eventPageable = getPageable(eventPage, eventPageSize);
+        Pageable pageable = getPageable(page, pageSize);
+
+        Criteria eventCriteria;
+        if (category.isEmpty()) {
+            eventCriteria = new Criteria("name").contains(query).and("event").is("DISCOUNT");
+        } else {
+            eventCriteria = new Criteria("name").contains(query).and("event").is("DISCOUNT").and("category").is(category);
+        }
+        SearchPage<ProductDocument> eventProducts = getPagedSearchResults(eventCriteria, eventPageable);
+
+        Criteria criteria;
+        if (category.isEmpty()) {
+            criteria = new Criteria("name").contains(query).and("event").is("NORMAL");
+        } else {
+            criteria = new Criteria("name").contains(query).and("event").is("NORMAL").and("category").is(category);
+        }
+        SearchPage<ProductDocument> products = getPagedSearchResults(criteria, pageable);
+
+        Page<ProductResponseDto> eventProductsResponse = eventProducts.map(ProductResponseDto::from);
+        Page<ProductResponseDto> productsResponse = products.map(ProductResponseDto::from);
+
+        return ProductListResponseDto.of(eventProductsResponse, productsResponse);
+    }
 
     @Transactional(readOnly = true)
     public ProductResponseDto getProduct(Long productId) {
@@ -99,6 +130,8 @@ public class ProductService {
         productRepository.save(newProduct);
         stockRepository.save(stock);
         saveAndUploadImage(newProduct, files);
+
+        elasticsearchOperations.save(ProductDocument.from(newProduct));
 
         if (newProduct.getEvent().equals(Event.DISCOUNT)) {
             kafkaHandler.sendEventToKafka(ProductResponseDto.from(newProduct));
@@ -138,6 +171,14 @@ public class ProductService {
             List<String> imgUrlList = getImgUrlList(product);
             return ProductResponseDto.of(product, imgUrlList);
         });
+    }
+
+    private SearchPage<ProductDocument> getPagedSearchResults(Criteria criteria, Pageable pageable) {
+        Query searchQuery = new CriteriaQuery(criteria);
+        SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(searchQuery, ProductDocument.class);
+        return SearchHitSupport.searchPageFor(searchHits, pageable);
+//        SearchPage<ProductDocument> searchPage = SearchHitSupport.searchPageFor(searchHits, pageable);
+//        return (Page<ProductDocument>) SearchHitSupport.unwrapSearchHits(searchPage);
     }
 
     private Pageable getPageable(int page, int pageSize) {

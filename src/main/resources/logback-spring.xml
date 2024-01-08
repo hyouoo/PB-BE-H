@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="30 seconds">
     <springProfile name="dev">
-        <property name="dest-logstash" value="15.164.171.175:50000"/>
+        <property name="dest-logstash" value="43.201.23.128:50000"/>
         <property name="dest-kafka" value="3.34.153.100:19092,3.34.153.100:29092,3.34.153.100:39092"/>
     </springProfile>
 
