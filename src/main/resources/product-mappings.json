@@ -7,6 +7,9 @@
       "type": "text",
       "analyzer": "korean"
     },
+    "price": {
+      "type": "integer"
+    },
     "info": {
       "type": "text",
       "analyzer": "korean"
@@ -16,8 +19,20 @@
       "analyzer": "korean"
     },
     "event": {
-      "type": "keyword",
+      "type": "text",
       "analyzer": "korean"
+    },
+    "discountRate": {
+      "type": "integer"
+    },
+    "createdAt": {
+      "type": "date"
+    },
+    "modifiedAt": {
+      "type": "date"
+    },
+    "deleted": {
+      "type": "boolean"
     }
   }
 }

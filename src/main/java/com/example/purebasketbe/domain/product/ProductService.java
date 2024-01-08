@@ -12,10 +12,7 @@ import com.example.purebasketbe.global.s3.S3Handler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHitSupport;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -125,7 +122,6 @@ public class ProductService {
         checkExistProductByName(requestDto.name());
         Product newProduct = Product.from(requestDto);
         Stock stock = Stock.of(requestDto, newProduct);
-        newProduct.attachStock(stock);
 
         productRepository.save(newProduct);
         stockRepository.save(stock);
@@ -141,7 +137,7 @@ public class ProductService {
     @Transactional
     public void updateProduct(Long productId, ProductRequestDto requestDto, List<MultipartFile> files) {
         Product product = findProduct(productId);
-        Stock stock = product.getStock();
+        Stock stock = findStock(productId);
         product.update(requestDto);
 
         if (requestDto.stock() != null) {
@@ -174,11 +170,9 @@ public class ProductService {
     }
 
     private SearchPage<ProductDocument> getPagedSearchResults(Criteria criteria, Pageable pageable) {
-        Query searchQuery = new CriteriaQuery(criteria);
+        Query searchQuery = new CriteriaQuery(criteria, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
         SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(searchQuery, ProductDocument.class);
         return SearchHitSupport.searchPageFor(searchHits, pageable);
-//        SearchPage<ProductDocument> searchPage = SearchHitSupport.searchPageFor(searchHits, pageable);
-//        return (Page<ProductDocument>) SearchHitSupport.unwrapSearchHits(searchPage);
     }
 
     private Pageable getPageable(int page, int pageSize) {
@@ -213,5 +207,9 @@ public class ProductService {
         return productRepository.findByIdAndDeleted(id, false).orElseThrow(
                 () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
         );
+    }
+
+    private Stock findStock(Long productId) {
+        return stockRepository.findByProductId(productId);
     }
 }
