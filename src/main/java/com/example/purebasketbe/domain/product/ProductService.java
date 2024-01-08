@@ -93,17 +93,17 @@ public class ProductService {
 
         Criteria eventCriteria;
         if (category.isEmpty()) {
-            eventCriteria = new Criteria("name").contains(query).and("event").is("DISCOUNT").and("category").is(category);
-        } else {
             eventCriteria = new Criteria("name").contains(query).and("event").is("DISCOUNT");
+        } else {
+            eventCriteria = new Criteria("name").contains(query).and("event").is("DISCOUNT").and("category").is(category);
         }
         SearchPage<ProductDocument> eventProducts = getPagedSearchResults(eventCriteria, eventPageable);
 
         Criteria criteria;
         if (category.isEmpty()) {
-            criteria = new Criteria("name").contains(query).and("event").is("NORMAL").and("category").is(category);
-        } else {
             criteria = new Criteria("name").contains(query).and("event").is("NORMAL");
+        } else {
+            criteria = new Criteria("name").contains(query).and("event").is("NORMAL").and("category").is(category);
         }
         SearchPage<ProductDocument> products = getPagedSearchResults(criteria, pageable);
 
@@ -177,8 +177,6 @@ public class ProductService {
         Query searchQuery = new CriteriaQuery(criteria);
         SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(searchQuery, ProductDocument.class);
         return SearchHitSupport.searchPageFor(searchHits, pageable);
-//        SearchPage<ProductDocument> searchPage = SearchHitSupport.searchPageFor(searchHits, pageable);
-//        return (Page<ProductDocument>) SearchHitSupport.unwrapSearchHits(searchPage);
     }
 
     private Pageable getPageable(int page, int pageSize) {
