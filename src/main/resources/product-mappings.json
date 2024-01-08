@@ -7,17 +7,32 @@
       "type": "text",
       "analyzer": "korean"
     },
+    "price": {
+      "type": "integer"
+    },
     "info": {
-      "type": "keyword",
+      "type": "text",
       "analyzer": "korean"
     },
     "category": {
-      "type": "keyword",
+      "type": "text",
       "analyzer": "korean"
     },
     "event": {
-      "type": "match_only_text",
+      "type": "text",
       "analyzer": "korean"
+    },
+    "discountRate": {
+      "type": "integer"
+    },
+    "createdAt": {
+      "type": "date"
+    },
+    "modifiedAt": {
+      "type": "date"
+    },
+    "deleted": {
+      "type": "boolean"
     }
   }
 }
