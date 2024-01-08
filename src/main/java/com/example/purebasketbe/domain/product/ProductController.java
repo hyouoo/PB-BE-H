@@ -24,7 +24,7 @@ public class ProductController {
 
     @GetMapping("/search")
     public ResponseEntity<ProductListResponseDto> searchProducts(
-            @RequestParam String query,
+            @RequestParam(defaultValue = "", required = false) String query,
             @RequestParam(defaultValue = "", required = false) String category,
             @RequestParam(defaultValue = "1", required = false) int eventPage,
             @RequestParam(defaultValue = "1", required = false) int page) {
