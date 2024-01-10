@@ -56,6 +56,7 @@ public record ProductResponseDto(
                 .info(searchHit.getContent().getInfo())
                 .category(searchHit.getContent().getCategory())
                 .event(searchHit.getContent().getEvent())
+                .images(List.of(searchHit.getContent().getImg_url()))
                 .build();
     }
 }

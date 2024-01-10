@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.*;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Mapping;
+import org.springframework.data.elasticsearch.annotations.Setting;
 
 import java.time.LocalDateTime;
 
@@ -37,9 +39,11 @@ public class ProductDocument {
     //    @Field(type = FieldType.Boolean)
     private boolean deleted;
 
+    private String img_url;
+
     @Builder
-    private ProductDocument(Long id, String name, int price, String info, String category, Event event,
-                            int discountRate, LocalDateTime createdAt, LocalDateTime modifiedAt, boolean deleted) {
+    private ProductDocument(Long id, String name, int price, String info, String category, Event event, int discountRate,
+                            LocalDateTime createdAt, LocalDateTime modifiedAt, boolean deleted, String img_url) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -50,6 +54,7 @@ public class ProductDocument {
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
         this.deleted = deleted;
+        this.img_url = img_url;
     }
 
     public static ProductDocument from(Product product) {

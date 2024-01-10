@@ -22,7 +22,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
-    @GetMapping("/search")
+    @GetMapping("/search/index")
     public ResponseEntity<ProductListResponseDto> searchProducts(
             @RequestParam(defaultValue = "", required = false) String query,
             @RequestParam(defaultValue = "", required = false) String category,
@@ -32,7 +32,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
-    @GetMapping("/search/es")
+    @GetMapping("/search")
     public ResponseEntity<ProductListResponseDto> searchProductsByES(
             @RequestParam(defaultValue = "", required = false) String query,
             @RequestParam(defaultValue = "", required = false) String category,
