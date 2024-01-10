@@ -1,15 +1,15 @@
 package com.example.purebasketbe.domain.product;
 
 import com.example.purebasketbe.domain.product.entity.Stock;
-import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface StockRepository extends JpaRepository<Stock, Long> {
 
+    @Modifying
+    @Query("update Stock s set s.stock = s.stock - :amount where s.stock > :amount AND s.product.id = :productId")
+    void updateStockByAmountByProductId(int amount, long productId);
 }
