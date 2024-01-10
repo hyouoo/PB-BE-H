@@ -2,8 +2,10 @@ package com.example.purebasketbe.domain.product.dto;
 
 import com.example.purebasketbe.domain.product.entity.Event;
 import com.example.purebasketbe.domain.product.entity.Product;
+import com.example.purebasketbe.domain.product.entity.ProductDocument;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
+import org.springframework.data.elasticsearch.core.SearchHit;
 
 import java.util.List;
 
@@ -45,6 +47,15 @@ public record ProductResponseDto(
                 .category(product.getCategory())
                 .event(product.getEvent())
                 .discountRate(product.getDiscountRate())
+                .build();
+    }
+    public static ProductResponseDto from(SearchHit<ProductDocument> searchHit) {
+        return ProductResponseDto.builder()
+                .id(searchHit.getContent().getId())
+                .name(searchHit.getContent().getName())
+                .info(searchHit.getContent().getInfo())
+                .category(searchHit.getContent().getCategory())
+                .event(searchHit.getContent().getEvent())
                 .build();
     }
 }
