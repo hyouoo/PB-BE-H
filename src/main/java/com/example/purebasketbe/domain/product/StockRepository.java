@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface StockRepository extends JpaRepository<Stock, Long> {
   
     @Modifying
-    @Query("update Stock s set s.stock = s.stock - :amount where s.stock > :amount AND s.product.id = :productId")
+    @Query("update Stock s set s.stock = s.stock - :amount where s.stock >= :amount AND s.product.id = :productId")
     void updateStockByAmountByProductId(int amount, long productId);
 
     Stock findByProductId(Long productId);
