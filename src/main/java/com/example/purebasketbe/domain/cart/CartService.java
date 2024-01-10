@@ -71,6 +71,7 @@ public class CartService {
         return productRepository.findByIdAndDeleted(productId, false).orElseThrow(
                 () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
         );
+
     }
 
     private void checkIfExist(Product product, Member member) {

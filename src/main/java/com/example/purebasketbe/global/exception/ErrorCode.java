@@ -16,16 +16,13 @@ public enum ErrorCode {
     INVALID_EMAIL_PASSWORD(HttpStatus.BAD_REQUEST.value(), "이메일 또는 비밀번호가 정확하지 않습니다."),
 
 
-    STORE_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "상점이 이미 등록되어있습니다."),
     MENU_ALREADY_EXIST(HttpStatus.CONFLICT.value(), "이미 존재하는 메뉴입니다."),
     MENU_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "등록되지 않은 메뉴입니다"),
-    STORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "먼저 업장등록을 해주세요"),
     NEGATIVE_PRICE_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED.value(), "잘못된 가격표기법 입니다."),
     IMAGE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST.value(), "이미지 업로드 오류"),
     INVALID_IMAGE(HttpStatus.BAD_REQUEST.value(), "잘못된 이미지입니다."),
 
     ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 사용자를 찾을 수 없습니다."),
-
     INVALID_CART_ITEM(HttpStatus.BAD_REQUEST.value(), "장바구니에 없는 상품입니다."),
     PRODUCT_ALREADY_ADDED(HttpStatus.BAD_REQUEST.value(), "이미 장바구니에 등록된 상품입니다."),
 

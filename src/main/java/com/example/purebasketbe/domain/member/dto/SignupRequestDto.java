@@ -21,3 +21,4 @@ public record SignupRequestDto(
         String phone
 ) {
 }
+

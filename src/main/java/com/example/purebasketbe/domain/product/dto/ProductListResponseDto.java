@@ -1,8 +1,6 @@
 package com.example.purebasketbe.domain.product.dto;
 
-import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 
 
