@@ -4,7 +4,6 @@ import com.example.purebasketbe.domain.member.entity.Member;
 import com.example.purebasketbe.domain.product.ProductRepository;
 import com.example.purebasketbe.domain.product.StockRepository;
 import com.example.purebasketbe.domain.product.entity.Product;
-import com.example.purebasketbe.domain.product.entity.Stock;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto.PurchaseDetail;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseResponseDto;
 import com.example.purebasketbe.domain.purchase.entity.Purchase;
@@ -19,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -35,24 +35,19 @@ public class PurchaseService {
 
     private final int PRODUCTS_PER_PAGE = 10;
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void purchaseProducts(List<PurchaseDetail> purchaseRequestDto, Member member) {
         int size = purchaseRequestDto.size();
         // Lock 적용
         List<Long> requestedProductsIds = purchaseRequestDto.stream()
                 .map(PurchaseDetail::productId).toList();
-//        List<Stock> stockList = stockRepository.findAllByProductIdIn(requestedProductsIds);
 
-        List<Product> validProductList = productRepository.findByIdInAndDeleted(requestedProductsIds, false);
-        validateProducts(size, validProductList);
-
-//        List<Integer> amountList = purchaseRequestDto.stream().map(PurchaseDetail::amount).toList();
-//        for (int i = 0; i < size; i++) {
-//            Stock stock = stockList.get(i);
-//            int amount = amountList.get(i);
-//            checkProductStock(stock, amount);
-//            stock.decrementStock(amount);
-//        }
+        List<Integer> amountList = purchaseRequestDto.stream().map(PurchaseDetail::amount).toList();
+        for (int i = 0; i < size; i++) {
+            Long productId = requestedProductsIds.get(i);
+            int amount = amountList.get(i);
+            stockRepository.updateStockByAmountByProductId(amount, productId);
+        }
 
         kafkaService.sendPurchaseToKafka(purchaseRequestDto, member);
         log.info("회원 {}: 상품 구매 요청 적재", member.getId());
@@ -74,10 +69,4 @@ public class PurchaseService {
             throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
         }
     }
-
-//    private static void checkProductStock(Stock stock, int amount) {
-//        if (stock.getStock() < amount) {
-//            throw new CustomException(ErrorCode.NOT_ENOUGH_PRODUCT);
-//        }
-//    }
 }
