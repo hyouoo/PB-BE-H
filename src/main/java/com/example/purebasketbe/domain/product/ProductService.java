@@ -110,6 +110,7 @@ public class ProductService {
         return ProductListResponseDto.of(eventProductsResponse, productsResponse);
     }
 
+    @Cacheable(value = "product", key = "#productId")
     @Transactional(readOnly = true)
     public ProductResponseDto getProduct(Long productId) {
         Product product = findProduct(productId);
