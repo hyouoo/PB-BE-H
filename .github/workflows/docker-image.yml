@@ -27,7 +27,6 @@ jobs:
 
     # (1) application.properties, application-dev.properties 파일 생성
     - uses: actions/checkout@v3
-    - run: mkdir ./src/main/resources
     - run: touch ./src/main/resources/application.properties
     - run: touch ./src/main/resources/application-dev.properties
     - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
