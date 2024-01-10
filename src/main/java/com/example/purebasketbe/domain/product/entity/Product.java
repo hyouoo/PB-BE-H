@@ -49,16 +49,13 @@ public class Product {
     @Column(nullable = false)
     private boolean deleted;
 
-    @OneToOne(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    private Stock stock;
-
     @BatchSize(size = 21)
     @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
 
     @Builder
     private Product(String name, Integer price,  String info,
-                    String category, Event event, Integer discountRate, Stock stock) {
+                    String category, Event event, Integer discountRate) {
         this.name = name;
         this.price = price;
         this.info = info;
@@ -68,7 +65,6 @@ public class Product {
         this.createdAt = LocalDateTime.now();
         this.modifiedAt = LocalDateTime.now();
         this.deleted = false;
-        this.stock = stock;
     }
 
     public static Product from(ProductRequestDto requestDto) {
@@ -96,9 +92,5 @@ public class Product {
         this.name += "-deleted-" + UUID.randomUUID();
         this.modifiedAt = LocalDateTime.now();
         this.deleted = true;
-    }
-
-    public void attachStock(Stock stock) {
-        this.stock = stock;
     }
 }
