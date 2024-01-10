@@ -27,6 +27,9 @@ dependencies {
     //redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
     // aws
     implementation 'io.awspring.cloud:spring-cloud-aws-starter:3.0.0'
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.0.0'
@@ -41,6 +44,19 @@ dependencies {
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
     implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
     implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
+
+    // prometheus grafana
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-core'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    // elk es 8.11.1
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+    implementation 'com.github.danielwegener:logback-kafka-appender:0.2.0-RC2'
+
+    // email service
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -60,7 +76,7 @@ tasks.named('test') {
 }
 
 test {
-    useJUnitPlatform()
+    useJUnitPlatform() // JUnit5
     finalizedBy jacocoTestReport // report is always generated after tests run
 }
 
@@ -68,17 +84,24 @@ jacoco {
     // JaCoCo 버전
     toolVersion = '0.8.9'
     reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
-
 }
 
 jacocoTestReport {
     dependsOn test // tests are required to run before generating the report
     reports {
-        xml.required = false
-        csv.required = false
-        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+        html.destination file('build/reports/testReport.html')
         finalizedBy 'jacocoTestCoverageVerification'
+    }
 
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    '**/PureBasketBeApplication',
+                    '**/security/*',
+                    '**/*dto*',
+                    '**/config/*'
+            ])
+        }))
     }
 }
 
@@ -88,17 +111,13 @@ jacocoTestCoverageVerification {
             enabled = true
             element = 'CLASS'
 
-            // 라인 커버리지 제한을 70%로 설정
-//            limit {
-//                counter = 'LINE'
-//                value = 'COVEREDRATIO'
-//                minimum = 0.70
-//            }
+            excludes = [
+                    '**.*PureBasketBeApplication*',
+                    '**.*security*',
+                    '**.*dto*',
+                    '**.*config*',
+            ]
         }
 
-
-        rule {
-            // 규칙을 여러개 추가할 수 있습니다.
-        }
     }
 }

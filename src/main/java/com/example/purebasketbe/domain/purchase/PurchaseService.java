@@ -1,65 +1,56 @@
 package com.example.purebasketbe.domain.purchase;
 
-import com.example.purebasketbe.domain.cart.CartRepository;
 import com.example.purebasketbe.domain.member.entity.Member;
 import com.example.purebasketbe.domain.product.ProductRepository;
+import com.example.purebasketbe.domain.product.StockRepository;
 import com.example.purebasketbe.domain.product.entity.Product;
-import com.example.purebasketbe.domain.purchase.dto.PurchaseResponseDto;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto.PurchaseDetail;
+import com.example.purebasketbe.domain.purchase.dto.PurchaseResponseDto;
 import com.example.purebasketbe.domain.purchase.entity.Purchase;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
+import com.example.purebasketbe.global.kafka.KafkaService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PurchaseService {
 
     private final PurchaseRepository purchaseRepository;
-    private final CartRepository cartRepository;
+    private final StockRepository stockRepository;
     private final ProductRepository productRepository;
+    private final KafkaService kafkaService;
 
     private final int PRODUCTS_PER_PAGE = 10;
 
-    @Transactional
-    public void purchaseProducts(final List<PurchaseDetail> purchaseRequestDto, Member member) {
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void purchaseProducts(List<PurchaseDetail> purchaseRequestDto, Member member) {
         int size = purchaseRequestDto.size();
-        List<PurchaseDetail> sortedPurchaseDetailList = purchaseRequestDto.stream()
-                .sorted(Comparator.comparing(PurchaseDetail::getProductId)).toList();
-        List<Long> requestIds = sortedPurchaseDetailList.stream()
-                .map(PurchaseDetail::getProductId).toList();
+        // Lock 적용
+        List<Long> requestedProductsIds = purchaseRequestDto.stream()
+                .map(PurchaseDetail::productId).toList();
 
-        List<Product> validProductList = productRepository.findByIdIn(requestIds);
-        validateProducts(size, validProductList);
-        List<Integer> amountList = sortedPurchaseDetailList.stream()
-                .map(PurchaseDetail::getAmount).toList();
-
-        List<Purchase> purchaseList = new ArrayList<>();
+        List<Integer> amountList = purchaseRequestDto.stream().map(PurchaseDetail::amount).toList();
         for (int i = 0; i < size; i++) {
-            Product product = validProductList.get(i);
+            Long productId = requestedProductsIds.get(i);
             int amount = amountList.get(i);
-            checkProductStock(product, amount);
-
-            Purchase purchase = Purchase.of(product, amount, member);
-            purchaseList.add(purchase);
-
-            product.incrementSalesCount(amount);
-            product.decrementStock(amount);
+            stockRepository.updateStockByAmountByProductId(amount, productId);
         }
 
-        purchaseRepository.saveAll(purchaseList);
-        cartRepository.deleteByUserAndProductIn(member, validProductList);
+        kafkaService.sendPurchaseToKafka(purchaseRequestDto, member);
+        log.info("회원 {}: 상품 구매 요청 적재", member.getId());
     }
 
     @Transactional(readOnly = true)
@@ -70,27 +61,12 @@ public class PurchaseService {
 
         Page<Purchase> purchases = purchaseRepository.findAllByMember(member, pageable);
 
-        return purchases.map(purchase -> {
-            Product product = getProductById(purchase.getProduct().getId());
-            return PurchaseResponseDto.of(product, purchase);
-        });
+        return purchases.map(PurchaseResponseDto::from);
     }
 
     private static void validateProducts(int size, List<Product> validProductList) {
         if (size != validProductList.size()) {
             throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
         }
-    }
-
-    private static void checkProductStock(Product product, int amount) {
-        if (product.getStock() < amount) {
-            throw new CustomException(ErrorCode.NOT_ENOUGH_PRODUCT);
-        }
-    }
-
-    private Product getProductById(Long id) {
-        return productRepository.findById(id).orElseThrow(
-                () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
-        );
     }
 }

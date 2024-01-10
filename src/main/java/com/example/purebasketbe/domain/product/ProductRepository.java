@@ -4,11 +4,11 @@ import com.example.purebasketbe.domain.product.entity.Event;
 import com.example.purebasketbe.domain.product.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -22,7 +22,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findAllByDeletedAndEventAndNameContains(boolean isDeleted, Event event, String query, Pageable pageable);
 
-    List<Product> findByIdIn(List<Long> requestIds);
-
     Optional<Product> findByIdAndDeleted(Long productId, boolean isDeleted);
+
+    List<Product> findByIdInAndDeleted(List<Long> requestedProductsIds, boolean isDeleted);
+
 }

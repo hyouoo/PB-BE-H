@@ -14,16 +14,15 @@ import java.util.Optional;
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
 
-    @Modifying
+    @Query("select exists (select c.id from Cart c where c.product = :product and c.member = :member)")
+    boolean existsProductByMember(Product product, Member member);
+
+    @Modifying(clearAutomatically = true)
     @Query("DELETE FROM Cart c WHERE c.member=:member AND c.product IN (:products)")
-    void deleteByUserAndProductIn(Member member, List<Product> products);
+    void deleteAllByMemberAndProductIn(Member member, List<Product> products);
 
-    @Query("SELECT c FROM Cart c " +
-            "JOIN FETCH c.product " +
-            "WHERE c.member = :member")
+    @Query("SELECT c FROM Cart c JOIN FETCH c.product WHERE c.member = :member")
     List<Cart> findAllByMember(Member member);
-
-    void deleteAllByMemberAndProductIn(Member member, List<Product> productList);
 
     Optional<Cart> findByProductIdAndMember(Long productId, Member member);
 

@@ -4,28 +4,24 @@ import com.example.purebasketbe.domain.product.entity.Event;
 import com.example.purebasketbe.domain.product.entity.Product;
 import com.example.purebasketbe.domain.recipe.entity.Recipe;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 
-@Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RecipeResponseDto {
-    private final Long id;
-    private final String name;
-    private final String info;
-    private final String imgUrl;
-    private final List<RelatedProductResponseDto> products;
+public record RecipeResponseDto(
+        Long id,
+        String name,
+        String info,
+        String imgUrl,
+        List<RelatedProductResponseDto> products
+) {
 
     @Builder
-    private RecipeResponseDto(Long id, String name, String info, String imgUrl, List<RelatedProductResponseDto> products) {
-        this.id = id;
-        this.name = name;
-        this.info = info;
-        this.imgUrl = imgUrl;
-        this.products = products;
+    public RecipeResponseDto {
     }
 
     public static RecipeResponseDto from(Recipe recipe) {
@@ -52,14 +48,14 @@ public class RecipeResponseDto {
     }
 
 
-    @Getter
     @Builder
-    private static class RelatedProductResponseDto {
-        private Long id;
-        private String name;
-        private Integer price;
-        private Event event;
-        private String imgUrl;
+    private record RelatedProductResponseDto(
+            Long id,
+            String name,
+            Integer price,
+            Event event,
+            String imgUrl
+    ) {
 
         private static RelatedProductResponseDto from(Product product) {
             String imgUrl = product.getImages().isEmpty() ? "default Url" : product.getImages().get(0).getImgUrl();

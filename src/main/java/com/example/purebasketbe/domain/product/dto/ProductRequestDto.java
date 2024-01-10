@@ -1,8 +1,6 @@
 package com.example.purebasketbe.domain.product.dto;
 
 import com.example.purebasketbe.domain.product.entity.Event;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

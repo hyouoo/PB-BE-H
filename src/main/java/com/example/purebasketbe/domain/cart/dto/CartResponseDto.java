@@ -1,42 +1,41 @@
 package com.example.purebasketbe.domain.cart.dto;
 
 import com.example.purebasketbe.domain.cart.entity.Cart;
-import com.example.purebasketbe.domain.product.entity.Image;
+import com.example.purebasketbe.domain.product.entity.Event;
 import com.example.purebasketbe.domain.product.entity.Product;
-import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CartResponseDto {
+public record CartResponseDto(
+        Long id,
+        String name,
+        Integer price,
+        String category,
+        String imageUrl,
+        int amount,
 
-    private Long id;
-    private String name;
-    private Integer price;
-    private String category;
-    private String imageUrl;
-    private int amount;
+        Event event,
 
+        int discountRate
+
+) {
     @Builder
-    private CartResponseDto(Long id, String name, Integer price, String category, String imageUrl, int amount) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
-        this.category = category;
-        this.imageUrl = imageUrl;
-        this.amount = amount;
+    public CartResponseDto {
+
     }
 
-    public static CartResponseDto of(Product product, Image image, Cart cart){
+
+    public static CartResponseDto from( Cart cart) {
+        Product product = cart.getProduct();
         return CartResponseDto.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())
                 .category(product.getCategory())
-                .imageUrl(image.getImgUrl())
+                .imageUrl(product.getImages().get(0).getImgUrl())
+                .event(product.getEvent())
+                .discountRate(product.getDiscountRate())
                 .amount(cart.getAmount())
                 .build();
     }
+
 }

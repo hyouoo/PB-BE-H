@@ -38,10 +38,17 @@ public class Cart {
         this.product = product;
     }
 
-    public static Cart of(Product product, Member member, CartRequestDto requestDto) {
-        int amount = requestDto == null ? 1 : requestDto.amount();
+    public static Cart of(Product product, Member member) {
         return Cart.builder()
-                .amount(amount)
+                .amount(1)
+                .member(member)
+                .product(product)
+                .build();
+    }
+
+    public static Cart of(Product product, Member member, CartRequestDto requestDto) {
+        return Cart.builder()
+                .amount(requestDto.amount())
                 .member(member)
                 .product(product)
                 .build();

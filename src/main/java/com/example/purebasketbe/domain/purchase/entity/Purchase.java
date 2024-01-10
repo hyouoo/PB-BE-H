@@ -1,13 +1,14 @@
 package com.example.purebasketbe.domain.purchase.entity;
 
 import com.example.purebasketbe.domain.member.entity.Member;
-import com.example.purebasketbe.domain.product.entity.Product;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,40 +19,21 @@ public class Purchase extends TimeStamp{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
-
-    @Min(value = 1)
-    @Column(nullable = false)
-    private int amount;
-
-    @Column(nullable = false)
-    private int price;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @OneToMany(mappedBy="purchase", fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<PurchaseDetail> purchaseDetails = new ArrayList<>();
+
+    @Column(nullable = false)
+    private int totalPrice;
 
     @Builder
-    private Purchase(String name, int amount, int price, Member member, Product product) {
-        this.name = name;
-        this.amount = amount;
-        this.price = price;
-        this.member = member;
-        this.product = product;
-    }
+    private Purchase(Member member, int totalPrice) {
 
-    public static Purchase of(Product product, int amount, Member member) {
-        return Purchase.builder()
-                .name(product.getName())
-                .amount(amount)
-                .price(product.getPrice())
-                .member(member)
-                .product(product)
-                .build();
+        this.member = member;
+        this.totalPrice = totalPrice;
     }
 }

@@ -6,9 +6,11 @@ import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -24,6 +26,7 @@ public class MemberService {
         Member member = Member.of(requestDto, password);
         memberRepository.save(member);
     }
+
 
     private void checkIfEmailExist(String email) {
         if (memberRepository.existsByEmail(email)) {

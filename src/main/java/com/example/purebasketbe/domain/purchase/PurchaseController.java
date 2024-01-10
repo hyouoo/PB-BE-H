@@ -1,14 +1,13 @@
 package com.example.purebasketbe.domain.purchase;
 
 import com.example.purebasketbe.domain.member.entity.Member;
-import com.example.purebasketbe.domain.purchase.dto.PurchaseResponseDto;
 import com.example.purebasketbe.domain.purchase.dto.PurchaseRequestDto;
+import com.example.purebasketbe.domain.purchase.dto.PurchaseResponseDto;
 import com.example.purebasketbe.global.tool.LoginAccount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +20,8 @@ public class PurchaseController {
 
     @PostMapping
     public ResponseEntity<Void> purchaseProducts(@RequestBody @Validated PurchaseRequestDto requestDto,
-                                                  @LoginAccount Member member) {
-        purchaseService.purchaseProducts(requestDto.getPurchaseList(), member);
+                                                 @LoginAccount Member member) {
+        purchaseService.purchaseProducts(requestDto.purchaseList(), member);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -30,8 +29,8 @@ public class PurchaseController {
 
     @GetMapping
     public ResponseEntity<Page<PurchaseResponseDto>> getPurchases(
-        @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue="purchasedAt") String sortBy,
-        @RequestParam(defaultValue = "desc") String order, @LoginAccount Member member) {
+            @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "purchasedAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String order, @LoginAccount Member member) {
         Page<PurchaseResponseDto> responseBody = purchaseService.getPurchases(member, page - 1, sortBy, order);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }

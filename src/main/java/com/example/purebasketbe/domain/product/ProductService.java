@@ -1,20 +1,31 @@
 package com.example.purebasketbe.domain.product;
 
-import com.example.purebasketbe.domain.product.dto.*;
-import com.example.purebasketbe.domain.product.entity.Event;
-import com.example.purebasketbe.domain.product.entity.Image;
-import com.example.purebasketbe.domain.product.entity.Product;
+import com.example.purebasketbe.domain.product.dto.ProductListResponseDto;
+import com.example.purebasketbe.domain.product.dto.ProductRequestDto;
+import com.example.purebasketbe.domain.product.dto.ProductResponseDto;
+import com.example.purebasketbe.domain.product.entity.*;
+import com.example.purebasketbe.global.RestPageImpl;
 import com.example.purebasketbe.global.exception.CustomException;
 import com.example.purebasketbe.global.exception.ErrorCode;
+import com.example.purebasketbe.global.kafka.KafkaService;
 import com.example.purebasketbe.global.s3.S3Handler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHitSupport;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.SearchPage;
+import org.springframework.data.elasticsearch.core.query.Criteria;
+import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
+import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,25 +33,30 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ImageRepository imageRepository;
+    private final StockRepository stockRepository;
     private final S3Handler s3Handler;
+    private final KafkaService kafkaHandler;
+    private final ElasticsearchOperations elasticsearchOperations;
 
     @Value("${products.event.page.size}")
     private int eventPageSize;
     @Value("${products.page.size}")
     private int pageSize;
 
+    @Cacheable(value = "products", key = "#eventPage + '_' + #page")
     @Transactional(readOnly = true)
     public ProductListResponseDto getProducts(int eventPage, int page) {
         Pageable eventPageable = getPageable(eventPage, eventPageSize);
         Pageable pageable = getPageable(page, pageSize);
 
+
         Page<Product> eventProducts = productRepository.findAllByDeletedAndEvent(false, Event.DISCOUNT, eventPageable);
         Page<Product> products = productRepository.findAllByDeletedAndEvent(false, Event.NORMAL, pageable);
 
-        Page<ProductResponseDto> eventProductsResponse = getResponseDtoFromProducts(eventProducts);
-        Page<ProductResponseDto> productsResponse = getResponseDtoFromProducts(products);
+        RestPageImpl<ProductResponseDto> eventProductsRestPage = RestPageImpl.from(getResponseDtoFromProducts(eventProducts));
+        RestPageImpl<ProductResponseDto> productsRestPage = RestPageImpl.from(getResponseDtoFromProducts(products));
 
-        return ProductListResponseDto.of(eventProductsResponse, productsResponse);
+        return ProductListResponseDto.of(eventProductsRestPage, productsRestPage);
     }
 
     @Transactional(readOnly = true)
@@ -67,6 +83,32 @@ public class ProductService {
         return ProductListResponseDto.of(eventProductsResponse, productsResponse);
     }
 
+    @Transactional(readOnly = true)
+    public ProductListResponseDto searchProductsByES(String query, String category, int eventPage, int page) {
+        Pageable eventPageable = getPageable(eventPage, eventPageSize);
+        Pageable pageable = getPageable(page, pageSize);
+
+        Criteria eventCriteria;
+        if (category.isEmpty()) {
+            eventCriteria = new Criteria("name").contains(query).and("event").is("DISCOUNT");
+        } else {
+            eventCriteria = new Criteria("name").contains(query).and("event").is("DISCOUNT").and("category").is(category);
+        }
+        SearchPage<ProductDocument> eventProducts = getPagedSearchResults(eventCriteria, eventPageable);
+
+        Criteria criteria;
+        if (category.isEmpty()) {
+            criteria = new Criteria("name").contains(query).and("event").is("NORMAL");
+        } else {
+            criteria = new Criteria("name").contains(query).and("event").is("NORMAL").and("category").is(category);
+        }
+        SearchPage<ProductDocument> products = getPagedSearchResults(criteria, pageable);
+
+        Page<ProductResponseDto> eventProductsResponse = eventProducts.map(ProductResponseDto::from);
+        Page<ProductResponseDto> productsResponse = products.map(ProductResponseDto::from);
+
+        return ProductListResponseDto.of(eventProductsResponse, productsResponse);
+    }
 
     @Transactional(readOnly = true)
     public ProductResponseDto getProduct(Long productId) {
@@ -79,18 +121,35 @@ public class ProductService {
     public void registerProduct(ProductRequestDto requestDto, List<MultipartFile> files) {
         checkExistProductByName(requestDto.name());
         Product newProduct = Product.from(requestDto);
+        Stock stock = Stock.of(requestDto, newProduct);
 
         productRepository.save(newProduct);
+        stockRepository.save(stock);
         saveAndUploadImage(newProduct, files);
+
+        elasticsearchOperations.save(ProductDocument.from(newProduct));
+
+        if (newProduct.getEvent().equals(Event.DISCOUNT)) {
+            kafkaHandler.sendEventToKafka(ProductResponseDto.from(newProduct));
+        }
     }
 
     @Transactional
     public void updateProduct(Long productId, ProductRequestDto requestDto, List<MultipartFile> files) {
         Product product = findProduct(productId);
+        Stock stock = findStock(productId);
         product.update(requestDto);
+
+        if (requestDto.stock() != null) {
+            stock.update(requestDto.stock());
+        }
 
         if (!files.isEmpty()) {
             saveAndUploadImage(product, files);
+        }
+
+        if (product.getEvent().equals(Event.DISCOUNT)) {
+            kafkaHandler.sendEventToKafka(ProductResponseDto.from(product));
         }
     }
 
@@ -98,9 +157,9 @@ public class ProductService {
     public void deleteProduct(Long productId) {
         Product product = findProduct(productId);
         product.softDelete();
-        imageRepository.findAllByProductId(productId)
-                .forEach(image -> s3Handler.deleteImage(image.getImgUrl()));
+        List<Image> imageList = imageRepository.findAllByProductId(productId);
         imageRepository.deleteAllByProductId(productId);
+        imageList.forEach(image -> s3Handler.deleteImage(image.getImgUrl()));
     }
 
     private Page<ProductResponseDto> getResponseDtoFromProducts(Page<Product> products) {
@@ -110,16 +169,19 @@ public class ProductService {
         });
     }
 
+    private SearchPage<ProductDocument> getPagedSearchResults(Criteria criteria, Pageable pageable) {
+        Query searchQuery = new CriteriaQuery(criteria, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
+        SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(searchQuery, ProductDocument.class);
+        return SearchHitSupport.searchPageFor(searchHits, pageable);
+    }
+
     private Pageable getPageable(int page, int pageSize) {
         Sort sort = Sort.by(Sort.Direction.DESC, "modifiedAt");
         return PageRequest.of(page, pageSize, sort);
     }
 
     private List<String> getImgUrlList(Product product) {
-        return imageRepository.findAllByProductId(product.getId())
-                .stream()
-                .map(Image::getImgUrl)
-                .toList();
+        return product.getImages().stream().map(Image::getImgUrl).toList();
     }
 
     private void saveAndUploadImage(Product product, List<MultipartFile> files) {
@@ -145,5 +207,9 @@ public class ProductService {
         return productRepository.findByIdAndDeleted(id, false).orElseThrow(
                 () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
         );
+    }
+
+    private Stock findStock(Long productId) {
+        return stockRepository.findByProductId(productId);
     }
 }

@@ -2,40 +2,40 @@ package com.example.purebasketbe.domain.product.dto;
 
 import com.example.purebasketbe.domain.product.entity.Event;
 import com.example.purebasketbe.domain.product.entity.Product;
+import com.example.purebasketbe.domain.product.entity.ProductDocument;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import org.springframework.data.elasticsearch.core.SearchHit;
 
 import java.util.List;
 
-@Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProductResponseDto {
-
-    private Long id;
-    private String name;
-    private int price;
-    private int stock;
-    private String info;
-    private String category;
-    private Event event;
-    private int discountRate;
-    private List<String> images;
+public record ProductResponseDto(
+        Long id,
+        String name,
+        int price,
+        String info,
+        String category,
+        Event event,
+        int discountRate,
+        List<String> images
+) {
 
     @Builder
-    ProductResponseDto(Long id, String name, int price, int stock, String info,
-                       String category, Event event, int discountRate) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
-        this.stock = stock;
-        this.info = info;
-        this.category = category;
-        this.event = event;
-        this.discountRate = discountRate;
+    public ProductResponseDto {
+    }
+
+    public static ProductResponseDto of(Product product, List<String> imgUrlList) {
+        return ProductResponseDto.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .info(product.getInfo())
+                .category(product.getCategory())
+                .event(product.getEvent())
+                .discountRate(product.getDiscountRate())
+                .images(imgUrlList)
+                .build();
     }
 
     public static ProductResponseDto from(Product product) {
@@ -43,21 +43,19 @@ public class ProductResponseDto {
                 .id(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())
-                .stock(product.getStock())
                 .info(product.getInfo())
                 .category(product.getCategory())
                 .event(product.getEvent())
                 .discountRate(product.getDiscountRate())
                 .build();
     }
-
-    public static ProductResponseDto of(Product product, List<String> imgUrlLsit) {
-        ProductResponseDto productResponseDto = ProductResponseDto.from(product);
-        productResponseDto.addImgUrls(imgUrlLsit);
-        return productResponseDto;
-    }
-
-    private void addImgUrls(List<String> imgUrlList) {
-        this.images = imgUrlList;
+    public static ProductResponseDto from(SearchHit<ProductDocument> searchHit) {
+        return ProductResponseDto.builder()
+                .id(searchHit.getContent().getId())
+                .name(searchHit.getContent().getName())
+                .info(searchHit.getContent().getInfo())
+                .category(searchHit.getContent().getCategory())
+                .event(searchHit.getContent().getEvent())
+                .build();
     }
 }

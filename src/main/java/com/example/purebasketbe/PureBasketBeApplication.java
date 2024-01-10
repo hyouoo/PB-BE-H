@@ -2,11 +2,14 @@ package com.example.purebasketbe;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableCaching
+@EnableScheduling
 @EnableJpaAuditing
-@SpringBootApplication(exclude = SecurityAutoConfiguration.class) // Spring Security 인증 기능 제외
+@SpringBootApplication
 public class PureBasketBeApplication {
 
     public static void main(String[] args) {

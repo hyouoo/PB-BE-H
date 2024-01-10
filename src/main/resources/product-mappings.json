@@ -1,0 +1,38 @@
+{
+  "properties": {
+    "id": {
+      "type": "long"
+    },
+    "name": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+    "price": {
+      "type": "integer"
+    },
+    "info": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+    "category": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+    "event": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+    "discountRate": {
+      "type": "integer"
+    },
+    "createdAt": {
+      "type": "date"
+    },
+    "modifiedAt": {
+      "type": "date"
+    },
+    "deleted": {
+      "type": "boolean"
+    }
+  }
+}

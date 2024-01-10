@@ -7,4 +7,10 @@ COPY ${JAR_FILE} app.jar
 # jar 파일 실행
 # 생성된 이미지를 컨테이너로 실행하는 시점에 app.jar 실행
 # Duser.timezone : 타임 존 지정
-ENTRYPOINT ["java", "-jar", "-Duser.timezone=Asia/Seoul", "/app.jar"]
+ENTRYPOINT ["java", "-jar",\
+ "-Duser.timezone=Asia/Seoul",\
+ "-Dspring.profiles.active=dev",\
+ "-javaagent:./pinpoint/pinpoint-bootstrap-2.5.3.jar",\
+ "-Dpinpoint.agentId=purebasket01","-Dpinpoint.applicationName=purebasket",\
+ "-Dpinpoint.config=./pinpoint/pinpoint-root.config",\
+ "/app.jar"]
