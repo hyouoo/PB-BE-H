@@ -4,6 +4,10 @@
         <property name="dest-logstash" value="172.31.39.89:50000"/>
         <property name="dest-kafka" value="172.31.2.26:19093,172.31.2.26:29093,172.31.2.26:39093"/>
     </springProfile>
+    <springProfile name="local">
+        <property name="dest-logstash" value="localhost:50000"/>
+        <property name="dest-kafka" value="13.125.41.65:19092,13.125.41.65:29092,13.125.41.65:39092"/>
+    </springProfile>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -32,11 +36,28 @@
         <producerConfig>max.block.ms=100</producerConfig>
     </appender>
 
+    <appender name="SLACK_APPENDER" class="com.example.purebasketbe.global.slack.SlackAppender" />
+    <appender name="ASYNC_SLACK_APPENDER" class="ch.qos.logback.classic.AsyncAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <appender-ref ref="SLACK_APPENDER"/>
+    </appender>
+
     <springProfile name="dev">
-        <root level="INFO">
+        <root level="WARN">
 <!--            <appender-ref ref="LOGSTASH"/>-->
 <!--            <appender-ref ref="KAFKA"/>-->
             <appender-ref ref="CONSOLE" />
+            <appender-ref ref="ASYNC_SLACK_APPENDER" />
+        </root>
+    </springProfile>
+    <springProfile name="local">
+        <root level="WARN">
+            <!--            <appender-ref ref="LOGSTASH"/>-->
+            <!--            <appender-ref ref="KAFKA"/>-->
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="ASYNC_SLACK_APPENDER" />
         </root>
     </springProfile>
 </configuration>
