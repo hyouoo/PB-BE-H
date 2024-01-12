@@ -55,17 +55,60 @@
 
 ## 🏗️ 03. 서비스 아키텍처
 
-![image](https://github.com/Pure-Basket/Pure-Basket-BE/assets/35479166/23c1746d-8575-482c-ac59-34563dc99c31)
+![image](https://github.com/Pure-Basket/Pure-Basket-BE/assets/50318500/6b010184-ae84-47b4-95c6-2c996f4f161b)
 
 <br>
 <br>
 
 
-## 🎢 04. 주요기능 (프론트 수정 후 gif)
+## 🎢 04. 주요기능
 
-[상품 조회 (1)](https://www.notion.so/1-f077751601634ad89e95a5dcc48e97c5?pvs=21)
+<details>
+<summary>🔍 상품 조회 및 검색 / 레시피 조회</summary>
 
-[상품 주문 (1)](https://www.notion.so/1-9696260ea5714cf5b06a3bd9bf77b7d8?pvs=21)
+- 조회
+        
+![home](https://github.com/Pure-Basket/Pure-Basket-BE/assets/50318500/217c6464-76fe-4c03-96b9-e82ed78e5755)
+        
+- 상품 검색
+        
+![search](https://github.com/Pure-Basket/Pure-Basket-BE/assets/50318500/b12c3af0-6f24-4e96-bec4-db22103ea5cf)
+        
+
+- 레시피 조회
+        
+![recipe](https://github.com/Pure-Basket/Pure-Basket-BE/assets/50318500/2eb1596c-5928-4dbd-871f-eb9acc827423)
+
+</details>
+
+<details>
+<summary>🛒 장바구니 추가</summary>
+    
+- 개별 상품 장바구니 추가
+    
+![cart](https://github.com/Pure-Basket/Pure-Basket-BE/assets/50318500/514fe436-3442-4b18-9547-7967d77b2647)
+    
+- 레시피 관련 상품 장바구니 추가
+    
+![recipecart](https://github.com/Pure-Basket/Pure-Basket-BE/assets/50318500/3466286e-7265-450f-bb7e-acb86973993a)
+
+</details>
+
+<details>
+<summary>🧾상품 주문</summary>
+    
+- 개별 상품 주문
+    
+![order](https://github.com/Pure-Basket/Pure-Basket-BE/assets/50318500/92a94454-f428-4c89-b5d4-b0dd33cfaef5)
+    
+- 장바구니 상품 주문
+    
+![orders](https://github.com/Pure-Basket/Pure-Basket-BE/assets/50318500/d4b2f848-6155-498f-bec4-7fcabbb30b78)
+</details>
+
+- 💡 이벤트 상품 알림
+
+- ⚙ 관리자 상품/레시피 CRUD
 
 <br>
 <br>
@@ -238,7 +281,7 @@
 
 </details>
 <details>
-<summary><strong>서버 Scale out</strong></summary>
+<summary><strong>로드밸런서</strong></summary>
 <p>
 💡 트래픽 증가를 대비해 예비 서버 추가를 통한 Scale out시 로드밸런서로 AWS ALB 사용
 </p>
