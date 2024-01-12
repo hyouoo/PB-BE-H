@@ -1,42 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="30 seconds">
+
+    <springProfile name="local">
+        <property resource="application-local.properties"/>
+    </springProfile>
+
     <springProfile name="dev">
-        <property name="dest-logstash" value="172.31.39.89:50000"/>
-        <property name="dest-kafka" value="172.31.2.26:19093,172.31.2.26:29093,172.31.2.26:39093"/>
+        <property resource="application-dev.properties"/>
     </springProfile>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>"%d{yyyy-MM-dd HH:mm:ss.SSS} %magenta([%thread]) %highlight([%-3level]) %logger{5} - %msg %n"</pattern>
+            <pattern>
+                %green(%d{yyyy-MM-dd HH:mm:ss.SSS}) %magenta([%thread]) %highlight([%-3level]) %cyan(%logger{5}) -
+                %yellow(%msg %n)
+            </pattern>
         </encoder>
     </appender>
 
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashAccessTcpSocketAppender">
-        <destination>${dest-logstash}</destination>
+        <destination>${dest.logstash}</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
         </encoder>
     </appender>
 
     <appender name="KAFKA" class="com.github.danielwegener.logback.kafka.KafkaAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %magenta([%thread]) %highlight([%-3level]) %logger{36} - %msg %n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-3level] %logger{35} - %msg %n</pattern>
         </encoder>
-
         <topic>logs</topic>
-        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy" />
-        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy" />
-
-        <producerConfig>bootstrap.servers=${dest-kafka}</producerConfig>
+        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy"/>
+        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy"/>
+        <producerConfig>bootstrap.servers=${dest.kafka}</producerConfig>
         <producerConfig>acks=0</producerConfig>
         <producerConfig>linger.ms=100</producerConfig>
         <producerConfig>max.block.ms=100</producerConfig>
     </appender>
 
+        <appender name="SLACK_APPENDER" class="com.github.maricn.logback.SlackAppender">
+            <webhookUri>${slack.webhook.url}</webhookUri>
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{35} -
+                    %msg %n
+                </pattern>
+            </layout>
+            <iconEmoji>:stuck_out_tongue_winking_eye:</iconEmoji>
+            <colorCoding>true</colorCoding>
+        </appender>
+
+<!--    <appender name="SLACK_APPENDER" class="com.example.purebasketbe.global.slack.SlackAppender">-->
+<!--        <webhookUrl>${slack.webhook.url}</webhookUrl>-->
+<!--    </appender>-->
+
+    <appender name="ASYNC_SLACK_APPENDER" class="ch.qos.logback.classic.AsyncAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <appender-ref ref="SLACK_APPENDER"/>
+    </appender>
+
     <springProfile name="dev">
-        <root level="INFO">
-<!--            <appender-ref ref="LOGSTASH"/>-->
-<!--            <appender-ref ref="KAFKA"/>-->
-            <appender-ref ref="CONSOLE" />
+        <root level="WARN">
+            <appender-ref ref="KAFKA"/>
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ASYNC_SLACK_APPENDER"/>
         </root>
     </springProfile>
+
+    <springProfile name="local">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ASYNC_SLACK_APPENDER"/>
+        </root>
+    </springProfile>
+
 </configuration>

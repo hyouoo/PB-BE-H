@@ -23,7 +23,14 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    set("logbackSlackAppenderVersion", "1.4.0")
+}
+
 dependencies {
+    // slack appender
+    implementation "com.github.maricn:logback-slack-appender:${logbackSlackAppenderVersion}"
+
     //redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
