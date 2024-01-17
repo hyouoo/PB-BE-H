@@ -39,7 +39,6 @@ public class RedisConfig {
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration("localhost",6379);
         return new LettuceConnectionFactory(standaloneConfiguration);
-
     }
 
 //    @Bean
@@ -68,10 +67,10 @@ public class RedisConfig {
 
     @Bean
     public CacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
-        RedisCacheManager redisCacheManager = RedisCacheManager.RedisCacheManagerBuilder
+        return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(redisConnectionFactory)
-                .cacheDefaults(redisCacheConfiguration()).build();
-        return redisCacheManager;
+                .cacheDefaults(redisCacheConfiguration())
+                .build();
     }
 
     private RedisCacheConfiguration redisCacheConfiguration() {
