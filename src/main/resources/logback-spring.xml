@@ -37,7 +37,7 @@
         <producerConfig>max.block.ms=100</producerConfig>
     </appender>
 
-        <appender name="SLACK_APPENDER" class="com.github.maricn.logback.SlackAppender">
+        <appender name="SLACK-APPENDER" class="com.github.maricn.logback.SlackAppender">
             <webhookUri>${slack.webhook.url}</webhookUri>
             <layout class="ch.qos.logback.classic.PatternLayout">
                 <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{35} -
@@ -48,29 +48,29 @@
             <colorCoding>true</colorCoding>
         </appender>
 
-<!--    <appender name="SLACK_APPENDER" class="com.example.purebasketbe.global.slack.SlackAppender">-->
+<!--    <appender name="SLACK-APPENDER" class="com.example.purebasketbe.global.slack.SlackAppender">-->
 <!--        <webhookUrl>${slack.webhook.url}</webhookUrl>-->
 <!--    </appender>-->
 
-    <appender name="ASYNC_SLACK_APPENDER" class="ch.qos.logback.classic.AsyncAppender">
+    <appender name="ASYNC-SLACK-APPENDER" class="ch.qos.logback.classic.AsyncAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>WARN</level>
         </filter>
-        <appender-ref ref="SLACK_APPENDER"/>
+        <appender-ref ref="SLACK-APPENDER"/>
     </appender>
 
     <springProfile name="dev">
         <root level="WARN">
             <appender-ref ref="KAFKA"/>
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="ASYNC_SLACK_APPENDER"/>
+            <appender-ref ref="ASYNC-SLACK-APPENDER"/>
         </root>
     </springProfile>
 
     <springProfile name="local">
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="ASYNC_SLACK_APPENDER"/>
+            <appender-ref ref="ASYNC-SLACK-APPENDER"/>
         </root>
     </springProfile>
 
